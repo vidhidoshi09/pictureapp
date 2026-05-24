@@ -482,18 +482,18 @@ async function removeBackground(jpegDataURL) {
 
   console.log('[mediapipe] Processing image...');
 
-  // Create canvas for segmentation
-  const canvas = document.createElement('canvas');
-  canvas.width = img.width;
-  canvas.height = img.height;
-  const ctx = canvas.getContext('2d');
+  // Use MediaPipe's send() API with callback
+  let results = null;
+  segmenter.onResults(res => {
+    results = res;
+  });
 
-  // Draw image
-  ctx.drawImage(img, 0, 0);
+  // Send image for processing
+  await segmenter.send({image: img});
 
-  // Get segmentation
-  const results = await segmenter.segmentForImage(img);
-  const mask = results.segmentationMask;
+  if (!results?.segmentationMask) {
+    throw new Error('Segmentation failed - no mask generated');
+  }
 
   // Create output canvas with transparency
   const output = document.createElement('canvas');
@@ -505,9 +505,9 @@ async function removeBackground(jpegDataURL) {
   outCtx.drawImage(img, 0, 0);
   const imageData = outCtx.getImageData(0, 0, output.width, output.height);
   const data = imageData.data;
-  const maskData = mask.data;
+  const maskData = results.segmentationMask.data;
 
-  // Apply mask to alpha channel
+  // Apply mask to alpha channel (higher mask value = more opaque foreground)
   for (let i = 0; i < maskData.length; i++) {
     const confidence = maskData[i];
     const alphaIdx = i * 4 + 3;
