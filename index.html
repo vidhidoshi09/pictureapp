@@ -57,6 +57,10 @@
       background-color: var(--color-bg);
       color: var(--color-text-primary);
       overflow: hidden;
+      /* Mobile-first: cap width so it never exceeds a phone screen */
+      max-width: 430px;
+      margin: 0 auto;
+      position: relative;
     }
 
     /* ── Dot texture ─────────────────────────────────────────────── */
@@ -71,7 +75,11 @@
        HOME / GRID
     ═══════════════════════════════════════════════════════════════ */
     #home {
-      position: fixed; inset: 0; z-index: 1;
+      position: fixed;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px;
+      bottom: 0;
+      z-index: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       padding:
@@ -164,7 +172,9 @@
     #fab {
       position: fixed;
       bottom: calc(var(--sp-2xl) + env(safe-area-inset-bottom, 0px));
-      right:  calc(var(--sp-xl)  + env(safe-area-inset-right,  0px));
+      /* Keep FAB inside the 430px mobile column */
+      right: max(calc(var(--sp-xl) + env(safe-area-inset-right, 0px)),
+                 calc(50vw - 215px + var(--sp-xl)));
       width: 58px; height: 58px;
       border-radius: var(--r-full);
       background: var(--color-accent);
@@ -198,7 +208,7 @@
 
     <div class="card" role="button" tabindex="0" aria-label="Vintage Key">
       <div class="card__img-wrap">
-        <img src="assets/key.webp" alt="Vintage Key" loading="eager" decoding="async" />
+        <img src="assets/key.png" alt="Vintage Key" loading="eager" decoding="async" />
       </div>
       <p class="card__name">Vintage Key</p>
       <p class="card__date" id="date-key"></p>
@@ -214,7 +224,7 @@
 
     <div class="card" role="button" tabindex="0" aria-label="Croissant">
       <div class="card__img-wrap">
-        <img src="assets/croissant.png" alt="Croissant" loading="eager" decoding="async" />
+        <img src="assets/croissant.webp" alt="Croissant" loading="eager" decoding="async" />
       </div>
       <p class="card__name">Croissant</p>
       <p class="card__date" id="date-croissant"></p>
@@ -222,7 +232,7 @@
 
     <div class="card" role="button" tabindex="0" aria-label="Rubber Duck">
       <div class="card__img-wrap">
-        <img src="assets/duck.webp" alt="Rubber Duck" loading="eager" decoding="async" />
+        <img src="assets/duck.png" alt="Rubber Duck" loading="eager" decoding="async" />
       </div>
       <p class="card__name">Rubber Duck</p>
       <p class="card__date" id="date-duck"></p>
