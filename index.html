@@ -464,9 +464,10 @@ async function getBgRemover() {
 async function removeBackground(jpegDataURL) {
   const removeBg = await getBgRemover();
 
-  // Config: load WASM + model files from unpkg CDN
+  // Config: try different publicPath - models may be in different location
   const config = {
-    publicPath: 'https://unpkg.com/@imgly/background-removal@1.7.0/dist/',
+    publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/',
+    proxyToWorker: true,
     debug: true,
   };
 
