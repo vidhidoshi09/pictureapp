@@ -435,36 +435,94 @@ function captureFrame() {
 }
 
 /* ════════════════════════════════════════════════
-   STEP 2 — IMAGE PROCESSING
-   Simple approach: just convert JPEG to PNG (JPEG to avoid
-   compression artifacts). White backgrounds will blend away
-   using mix-blend-mode: multiply on grey background.
+   STEP 2 — BACKGROUND REMOVAL
+   Uses TensorFlow.js BodyPix for person segmentation.
+   100% in-browser, no API keys, completely free.
 ════════════════════════════════════════════════ */
-async function removeBackground(jpegDataURL) {
-  // Convert JPEG data URL to PNG blob (preserves full image)
-  const res = await fetch(jpegDataURL);
-  const blob = await res.blob();
+let _segmentationModel = null;
 
-  // If already PNG, return as-is
-  if (blob.type === 'image/png') {
-    return blob;
+async function loadSegmentationModel() {
+  if (_segmentationModel) return _segmentationModel;
+
+  console.log('[tf] Loading BodyPix segmentation model...');
+
+  // Load TensorFlow.js if not already present
+  if (!window.tf) {
+    const tfScript = document.createElement('script');
+    tfScript.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js';
+    await new Promise((resolve, reject) => {
+      tfScript.onload = resolve;
+      tfScript.onerror = reject;
+      document.head.appendChild(tfScript);
+    });
   }
 
-  // Convert JPEG to PNG using canvas
+  // Load BodyPix script
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.2.0/dist/body-pix.js';
+
+  await new Promise((resolve, reject) => {
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+
+  // Initialize model
+  _segmentationModel = await window.bodyPix.load({
+    architecture: 'MobileNetV1',
+    outputStride: 16,
+    multiplier: 0.5,
+    quantBytes: 2
+  });
+
+  console.log('[tf] BodyPix model ready');
+  return _segmentationModel;
+}
+
+async function removeBackground(jpegDataURL) {
+  const model = await loadSegmentationModel();
+
+  // Load image
+  const res = await fetch(jpegDataURL);
+  const blob = await res.blob();
   const img = new Image();
+
   await new Promise((resolve, reject) => {
     img.onload = resolve;
     img.onerror = reject;
     img.src = URL.createObjectURL(blob);
   });
 
+  console.log('[tf] Running segmentation on image...');
+
+  // Run segmentation
+  const segmentation = await model.segmentPerson(img);
+
+  // Create output canvas
   const canvas = document.createElement('canvas');
   canvas.width = img.width;
   canvas.height = img.height;
   const ctx = canvas.getContext('2d');
+
+  // Draw original image
   ctx.drawImage(img, 0, 0);
 
-  console.log('[app] Image ready for review (mix-blend-mode will hide white backgrounds)');
+  // Get image data and apply segmentation mask
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  const segData = segmentation.data;
+
+  // Apply mask: segData[i] is 0 (background) or 1 (person)
+  for (let i = 0; i < segData.length; i++) {
+    const isForeground = segData[i];
+    const pixelIndex = i * 4;
+    // Set alpha: 255 if person, 0 if background
+    data[pixelIndex + 3] = isForeground ? 255 : 0;
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+
+  console.log('[tf] Segmentation complete');
 
   // Return PNG blob
   return new Promise(resolve => {
