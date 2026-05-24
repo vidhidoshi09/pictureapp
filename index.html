@@ -462,21 +462,39 @@ async function getBgRemover() {
 }
 
 async function removeBackground(jpegDataURL) {
-  const removeBackground = await getBgRemover();
+  const removeBg = await getBgRemover();
 
   // Config: load WASM + model files from the same CDN package
   const config = {
     publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/',
-    debug: true,   // logs model download progress to console
+    debug: true,
   };
 
   // Convert data URL → Blob for the library
-  const res  = await fetch(jpegDataURL);
+  const res = await fetch(jpegDataURL);
   const blob = await res.blob();
 
-  // Returns a PNG Blob with transparent background
-  const resultBlob = await removeBackground(blob, config);
-  return URL.createObjectURL(resultBlob);
+  console.log('[imgly] Processing image, blob size:', blob.size);
+
+  try {
+    // Try different API patterns depending on library version
+    let resultBlob;
+    if (typeof removeBg === 'function') {
+      // Direct function call
+      resultBlob = await removeBg(blob, config);
+    } else if (removeBg.removeBackground) {
+      // Named export method
+      resultBlob = await removeBg.removeBackground(blob, config);
+    } else {
+      throw new Error('Cannot find removeBackground method');
+    }
+
+    console.log('[imgly] Processing complete, result size:', resultBlob?.size);
+    return URL.createObjectURL(resultBlob);
+  } catch (err) {
+    console.error('[imgly] Processing error:', err.message);
+    throw err;
+  }
 }
 
 /* ════════════════════════════════════════════════
