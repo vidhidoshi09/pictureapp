@@ -444,7 +444,7 @@ async function getBgRemover() {
   if (_removeBackground) return _removeBackground;
   // Dynamically import the ESM library from jsDelivr CDN
   const mod = await import(
-    'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/background-removal.js'
+    'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs'
   );
   _removeBackground = mod.removeBackground;
   return _removeBackground;
@@ -455,8 +455,8 @@ async function removeBackground(jpegDataURL) {
 
   // Config: load WASM + model files from the same CDN package
   const config = {
-    publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/',
-    debug: false,
+    publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/',
+    debug: true,   // logs model download progress to console
   };
 
   // Convert data URL → Blob for the library
