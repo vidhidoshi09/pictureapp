@@ -443,11 +443,11 @@ let _removeBackground = null;
 
 async function getBgRemover() {
   if (_removeBackground) return _removeBackground;
-  // Dynamically import the ESM library from jsDelivr CDN
+  // Try unpkg CDN (more reliable for model files)
   try {
-    console.log('[imgly] Importing library...');
+    console.log('[imgly] Importing library from unpkg...');
     const mod = await import(
-      'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs'
+      'https://unpkg.com/@imgly/background-removal@1.7.0/dist/index.mjs'
     );
     console.log('[imgly] Import successful, exports:', Object.keys(mod));
     _removeBackground = mod.removeBackground || mod.default;
@@ -464,9 +464,9 @@ async function getBgRemover() {
 async function removeBackground(jpegDataURL) {
   const removeBg = await getBgRemover();
 
-  // Config: load WASM + model files from the same CDN package
+  // Config: load WASM + model files from unpkg CDN
   const config = {
-    publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/',
+    publicPath: 'https://unpkg.com/@imgly/background-removal@1.7.0/dist/',
     debug: true,
   };
 
