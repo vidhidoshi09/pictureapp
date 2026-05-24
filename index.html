@@ -9,9 +9,9 @@
   <title>Memories</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet" />
   <style>
-    /* ── Layer 1: Tokens ─────────────────────────────────────────── */
+    /* ── Tokens ──────────────────────────────────────────────────── */
     :root {
       --color-bg:             #edecea;
       --color-dot:            #ccc8c2;
@@ -19,30 +19,23 @@
       --color-text-secondary: #888888;
       --color-text-tertiary:  #bbbbbb;
       --color-accent:         #f5a742;
-      --color-accent-glow:    rgba(245,167,66,0.30);
       --color-camera-bg:      #000000;
 
       --font:         -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --font-display: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
-      --fs-xs:  11px;  --fs-sm:  13px;  --fs-base: 14px;
-      --fs-md:  15px;  --fs-xl:  28px;
-      --fw-reg: 400;   --fw-semi: 600;  --fw-bold: 800;
+      --fs-xs: 11px; --fs-sm: 13px; --fs-base: 14px; --fs-md: 15px; --fs-xl: 28px;
+      --fw-reg: 400; --fw-semi: 600; --fw-bold: 800;
 
-      --sp-sm: 8px;  --sp-md: 12px;  --sp-lg: 16px;
+      --sp-sm: 8px; --sp-md: 12px; --sp-lg: 16px;
       --sp-xl: 20px; --sp-2xl: 24px; --sp-3xl: 32px;
 
       --r-md: 20px; --r-full: 50%;
-
       --sh-object: drop-shadow(0 6px 18px rgba(0,0,0,0.14));
-      --sh-fab:    0 6px 20px rgba(245,167,66,0.35);
-      --tx-base:   0.2s ease;
+      --sh-fab: 0 6px 20px rgba(245,167,66,0.35);
+      --tx-base: 0.2s ease;
     }
 
-    /* ── Reset ───────────────────────────────────────────────────── */
-    *, *::before, *::after {
-      box-sizing: border-box; margin: 0; padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { height: 100%; }
 
     body {
@@ -55,7 +48,6 @@
       position: relative;
     }
 
-    /* ── Dot texture ─────────────────────────────────────────────── */
     #dots {
       position: fixed; inset: 0; z-index: 0;
       background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
@@ -63,15 +55,14 @@
       pointer-events: none;
     }
 
-    /* ═══════════════════════════════════════════════════════════════
+    /* ═══════════════════════════════════════
        HOME / GRID
-    ═══════════════════════════════════════════════════════════════ */
+    ═══════════════════════════════════════ */
     #home {
       position: fixed;
       top: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 430px; bottom: 0;
-      z-index: 1; overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+      z-index: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
       padding:
         calc(var(--sp-2xl) + env(safe-area-inset-top,    0px))
         calc(var(--sp-lg)  + env(safe-area-inset-right,  0px))
@@ -84,317 +75,521 @@
     .header__title { font-size: var(--fs-xl); font-weight: var(--fw-reg); letter-spacing: -0.5px; line-height: 1.15; }
     .header__count { font-size: var(--fs-sm); color: var(--color-text-secondary); margin-top: 4px; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: var(--sp-lg);
-      row-gap: var(--sp-3xl);
-    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--sp-lg); row-gap: var(--sp-3xl); }
 
-    .card {
-      cursor: pointer; user-select: none;
-      transition: transform var(--tx-base);
-      display: flex; flex-direction: column; align-items: center;
-    }
+    .card { cursor: pointer; user-select: none; transition: transform var(--tx-base); display: flex; flex-direction: column; align-items: center; }
     .card:active { transform: scale(0.97); }
 
-    .card__img-wrap {
-      width: 100%; aspect-ratio: 1;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .card__img-wrap img {
-      width: 90%; height: 90%;
-      object-fit: contain;
-      filter: var(--sh-object);
-      mix-blend-mode: multiply;
-    }
+    .card__img-wrap { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+    .card__img-wrap img { width: 90%; height: 90%; object-fit: contain; filter: var(--sh-object); mix-blend-mode: multiply; }
 
-    .card__name {
-      font-family: var(--font-display);
-      font-size: var(--fs-md); font-weight: var(--fw-bold);
-      letter-spacing: -0.2px; color: var(--color-text-primary);
-      text-align: center; margin-top: var(--sp-sm); line-height: 1.2;
-    }
-    .card__date {
-      font-size: var(--fs-xs); color: var(--color-text-tertiary);
-      text-align: center; margin-top: 4px;
-    }
+    .card__name { font-family: var(--font-display); font-size: var(--fs-md); font-weight: var(--fw-bold); letter-spacing: -0.2px; color: var(--color-text-primary); text-align: center; margin-top: var(--sp-sm); line-height: 1.2; }
+    .card__date  { font-size: var(--fs-xs); color: var(--color-text-tertiary); text-align: center; margin-top: 4px; }
 
-    /* ── FAB ─────────────────────────────────────────────────────── */
+    /* FAB */
     #fab {
       position: fixed;
       bottom: calc(var(--sp-2xl) + env(safe-area-inset-bottom, 0px));
-      right: max(calc(var(--sp-xl) + env(safe-area-inset-right, 0px)),
-                 calc(50vw - 215px + var(--sp-xl)));
-      width: 58px; height: 58px;
-      border-radius: var(--r-full);
-      background: var(--color-accent);
-      box-shadow: var(--sh-fab);
+      right: max(calc(var(--sp-xl) + env(safe-area-inset-right, 0px)), calc(50vw - 215px + var(--sp-xl)));
+      width: 58px; height: 58px; border-radius: var(--r-full);
+      background: var(--color-accent); box-shadow: var(--sh-fab);
       border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       font-size: 26px; font-weight: var(--fw-semi); color: #fff;
-      z-index: 50;
-      transition: transform var(--tx-base);
-      user-select: none;
+      z-index: 50; transition: transform var(--tx-base); user-select: none;
     }
     #fab:active { transform: scale(0.95); }
 
-    /* ═══════════════════════════════════════════════════════════════
-       STEP 1 — CAMERA OVERLAY
-       Full-screen black overlay. Video fills the screen edge-to-edge.
-       Shutter button at bottom centre. Close top-left.
-    ═══════════════════════════════════════════════════════════════ */
-    #camera-overlay {
-      display: none;               /* shown via .active */
+    /* ═══════════════════════════════════════
+       SHARED OVERLAY BASE
+    ═══════════════════════════════════════ */
+    .overlay {
+      display: none;
       position: fixed;
       top: 0; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 430px; height: 100%;
-      background: var(--color-camera-bg);
       z-index: 200;
-      flex-direction: column;
     }
-    #camera-overlay.active { display: flex; }
+    .overlay.active { display: flex; }
 
-    /* Live video — fills available space above controls */
-    #camera-video {
-      flex: 1;
-      width: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* Bottom control bar */
-    .cam-controls {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
-      padding-top: 24px;
-      background: var(--color-camera-bg);
-      position: relative;
-    }
-
-    /* Shutter button — classic camera style */
-    #shutter-btn {
-      width: 72px; height: 72px;
-      border-radius: var(--r-full);
-      background: #ffffff;
-      border: 4px solid rgba(255,255,255,0.4);
-      cursor: pointer;
-      transition: transform var(--tx-base), background var(--tx-base);
-      outline: none;
-      /* inner circle effect */
-      box-shadow: 0 0 0 3px #000, 0 0 0 6px rgba(255,255,255,0.35);
-    }
-    #shutter-btn:active { transform: scale(0.92); background: #ddd; }
-
-    /* Close button — top-left over video */
-    #camera-close {
+    /* Close / back button */
+    .btn-close {
       position: absolute;
       top: calc(16px + env(safe-area-inset-top, 0px));
       left: 16px;
-      width: 40px; height: 40px;
-      border-radius: var(--r-full);
-      background: rgba(0,0,0,0.45);
-      border: none; cursor: pointer;
+      width: 40px; height: 40px; border-radius: var(--r-full);
+      background: rgba(0,0,0,0.45); border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px; color: #fff;
-      z-index: 201;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      font-size: 18px; color: #fff; z-index: 10;
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     }
 
-    /* Camera permission denied state */
-    .cam-denied {
-      display: none;
-      flex: 1;
+    /* ═══════════════════════════════════════
+       STEP 1 — CAMERA
+    ═══════════════════════════════════════ */
+    #camera-overlay {
+      background: var(--color-camera-bg);
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #888;
-      font-size: var(--fs-sm);
-      text-align: center;
-      padding: 32px;
-      gap: 12px;
+    }
+
+    #camera-video { flex: 1; width: 100%; object-fit: cover; display: block; }
+
+    .cam-denied {
+      display: none; flex: 1; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #666; font-size: var(--fs-sm); text-align: center; padding: 32px; gap: 12px;
     }
     .cam-denied.visible { display: flex; }
     .cam-denied span:first-child { font-size: 40px; }
+
+    .cam-controls {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      padding: 24px 0 calc(36px + env(safe-area-inset-bottom, 0px));
+      background: var(--color-camera-bg);
+    }
+
+    #shutter-btn {
+      width: 72px; height: 72px; border-radius: var(--r-full);
+      background: #fff; border: none; cursor: pointer;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.25), 0 0 0 7px rgba(255,255,255,0.1);
+      transition: transform var(--tx-base), background var(--tx-base);
+      outline: none;
+    }
+    #shutter-btn:active { transform: scale(0.91); background: #ccc; }
+
+    /* ═══════════════════════════════════════
+       STEP 2 — PROCESSING (bg removal)
+    ═══════════════════════════════════════ */
+    #processing-overlay {
+      background: var(--color-bg);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 48px; height: 48px; border-radius: var(--r-full);
+      border: 4px solid rgba(245,167,66,0.2);
+      border-top-color: var(--color-accent);
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .processing-label {
+      font-family: var(--font-display);
+      font-size: var(--fs-md); font-weight: var(--fw-bold);
+      color: var(--color-text-primary);
+    }
+    .processing-sub {
+      font-size: var(--fs-sm); color: var(--color-text-secondary); text-align: center;
+    }
+
+    /* ═══════════════════════════════════════
+       STEP 3 — REVIEW (name + confirm)
+    ═══════════════════════════════════════ */
+    #review-overlay {
+      background: var(--color-bg);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding:
+        calc(72px + env(safe-area-inset-top, 0px))
+        var(--sp-2xl)
+        calc(var(--sp-2xl) + env(safe-area-inset-bottom, 0px));
+      gap: 0;
+    }
+
+    /* Object preview — floats on grey, no container */
+    .review-img-wrap {
+      width: 72%; aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: var(--sp-3xl);
+    }
+    .review-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      filter: var(--sh-object);
+    }
+
+    /* Name input */
+    #name-input {
+      width: 100%;
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: var(--fw-bold);
+      text-align: center; color: var(--color-text-primary);
+      background: transparent; border: none;
+      border-bottom: 2px solid rgba(0,0,0,0.1);
+      padding: 8px 4px 10px;
+      outline: none;
+      margin-bottom: var(--sp-3xl);
+    }
+    #name-input::placeholder { color: var(--color-text-tertiary); }
+    #name-input:focus { border-bottom-color: var(--color-accent); }
+
+    /* Action buttons row */
+    .review-actions {
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--sp-xl); width: 100%;
+    }
+
+    /* Retake — grey circle */
+    #retake-btn {
+      width: 52px; height: 52px; border-radius: var(--r-full);
+      background: #e2dfdb; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      transition: transform var(--tx-base);
+    }
+    #retake-btn:active { transform: scale(0.94); }
+
+    /* Save — orange pill */
+    #save-btn {
+      flex: 1; max-width: 200px;
+      height: 52px; border-radius: 26px;
+      background: var(--color-accent); border: none; cursor: pointer;
+      font-family: var(--font-display);
+      font-size: var(--fs-base); font-weight: var(--fw-bold);
+      color: #fff; letter-spacing: 0.3px;
+      box-shadow: var(--sh-fab);
+      transition: transform var(--tx-base);
+    }
+    #save-btn:active { transform: scale(0.96); }
   </style>
 </head>
 <body>
 
 <div id="dots" aria-hidden="true"></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     HOME
-═══════════════════════════════════════════════════════════════ -->
+<!-- HOME ─────────────────────────────────── -->
 <main id="home">
   <header class="header">
     <p class="header__date" id="header-date"></p>
     <h1 class="header__title">Memories</h1>
     <p class="header__count" id="header-count"></p>
   </header>
-
-  <section class="grid" id="grid" aria-label="Memory collection">
-    <div class="card" role="button" tabindex="0" aria-label="Vintage Key">
-      <div class="card__img-wrap">
-        <img src="assets/key.png" alt="Vintage Key" loading="eager" decoding="async" />
-      </div>
-      <p class="card__name">Vintage Key</p>
-      <p class="card__date" id="date-key"></p>
-    </div>
-    <div class="card" role="button" tabindex="0" aria-label="Blue Teapot">
-      <div class="card__img-wrap">
-        <img src="assets/teapot.png" alt="Blue Teapot" loading="eager" decoding="async" />
-      </div>
-      <p class="card__name">Blue Teapot</p>
-      <p class="card__date" id="date-teapot"></p>
-    </div>
-    <div class="card" role="button" tabindex="0" aria-label="Croissant">
-      <div class="card__img-wrap">
-        <img src="assets/croissant.png" alt="Croissant" loading="eager" decoding="async" />
-      </div>
-      <p class="card__name">Croissant</p>
-      <p class="card__date" id="date-croissant"></p>
-    </div>
-    <div class="card" role="button" tabindex="0" aria-label="Rubber Duck">
-      <div class="card__img-wrap">
-        <img src="assets/duck.png" alt="Rubber Duck" loading="eager" decoding="async" />
-      </div>
-      <p class="card__name">Rubber Duck</p>
-      <p class="card__date" id="date-duck"></p>
-    </div>
-  </section>
+  <section class="grid" id="grid" aria-label="Memory collection"></section>
 </main>
 
 <button id="fab" aria-label="Capture new object">+</button>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     STEP 1 — CAMERA OVERLAY
-═══════════════════════════════════════════════════════════════ -->
-<div id="camera-overlay" role="dialog" aria-modal="true" aria-label="Camera">
-
-  <button id="camera-close" aria-label="Close camera">✕</button>
-
-  <!-- Live feed -->
+<!-- STEP 1 — CAMERA ──────────────────────── -->
+<div id="camera-overlay" class="overlay" role="dialog" aria-label="Camera">
+  <button class="btn-close" id="camera-close" aria-label="Close">✕</button>
   <video id="camera-video" autoplay playsinline muted></video>
-
-  <!-- Camera denied fallback -->
   <div class="cam-denied" id="cam-denied">
     <span>📷</span>
-    <span>Camera access was denied.<br>Please allow camera access in your browser settings.</span>
+    <span>Camera access denied.<br>Allow camera in browser settings and try again.</span>
   </div>
-
-  <!-- Shutter controls -->
   <div class="cam-controls">
     <button id="shutter-btn" aria-label="Take photo"></button>
   </div>
 </div>
 
-<!-- Off-screen canvas for frame capture -->
+<!-- STEP 2 — PROCESSING ──────────────────── -->
+<div id="processing-overlay" class="overlay" role="status" aria-label="Removing background">
+  <div class="spinner"></div>
+  <p class="processing-label">Removing background…</p>
+  <p class="processing-sub">This runs in your browser.<br>No data leaves your device.</p>
+</div>
+
+<!-- STEP 3 — REVIEW ──────────────────────── -->
+<div id="review-overlay" class="overlay" role="dialog" aria-label="Review capture">
+  <button class="btn-close" id="review-close" aria-label="Close">✕</button>
+  <div class="review-img-wrap">
+    <img id="review-img" src="" alt="Captured object" />
+  </div>
+  <input id="name-input" type="text" placeholder="Name this object…"
+         maxlength="40" autocomplete="off" autocorrect="off"
+         autocapitalize="words" spellcheck="false" />
+  <div class="review-actions">
+    <button id="retake-btn" aria-label="Retake photo">↺</button>
+    <button id="save-btn">Save to Memories</button>
+  </div>
+</div>
+
 <canvas id="capture-canvas" style="display:none"></canvas>
 
 <script>
 'use strict';
 
-/* ── Helpers ─────────────────────────────────────────────────── */
-function fmtShort(d) { return d.toLocaleDateString('en-US', { month:'long', day:'numeric' }); }
-function fmtFull(d)  { return d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }); }
+/* ════════════════════════════════════════════════
+   STORAGE
+════════════════════════════════════════════════ */
+const STORAGE_KEY = 'memories_collection';
 
-/* ── Home dates ──────────────────────────────────────────────── */
-const today = new Date();
-document.getElementById('header-date').textContent  = fmtShort(today);
-document.getElementById('header-count').textContent = '4 objects collected';
-const dates = [3,5,8,11].map(n => new Date(today - n*86400000));
-document.getElementById('date-key').textContent       = fmtFull(dates[0]);
-document.getElementById('date-teapot').textContent    = fmtFull(dates[1]);
-document.getElementById('date-croissant').textContent = fmtFull(dates[2]);
-document.getElementById('date-duck').textContent      = fmtFull(dates[3]);
+function loadMemories() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
 
-/* ── Camera state ────────────────────────────────────────────── */
+function saveMemories(arr) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+  catch (e) { console.warn('localStorage full:', e); }
+}
+
+/* ════════════════════════════════════════════════
+   DATE HELPERS
+════════════════════════════════════════════════ */
+const fmtShort = d => d.toLocaleDateString('en-US', { month:'long', day:'numeric' });
+const fmtFull  = d => d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+
+/* ════════════════════════════════════════════════
+   SEED DATA (shown on first visit)
+════════════════════════════════════════════════ */
+const SEED = [
+  { id:1, name:'Vintage Key',  date:'May 21, 2026', image:'assets/key.png' },
+  { id:2, name:'Blue Teapot',  date:'May 19, 2026', image:'assets/teapot.png' },
+  { id:3, name:'Croissant',    date:'May 16, 2026', image:'assets/croissant.png' },
+  { id:4, name:'Rubber Duck',  date:'May 13, 2026', image:'assets/duck.png' },
+];
+
+function getMemories() {
+  const stored = loadMemories();
+  return stored.length ? stored : SEED;
+}
+
+/* ════════════════════════════════════════════════
+   RENDER GRID
+════════════════════════════════════════════════ */
+function renderGrid() {
+  const memories = getMemories().slice().reverse(); // newest first
+  const grid = document.getElementById('grid');
+
+  document.getElementById('header-date').textContent  = fmtShort(new Date());
+  document.getElementById('header-count').textContent =
+    `${memories.length} object${memories.length !== 1 ? 's' : ''} collected`;
+
+  grid.innerHTML = memories.map(m => `
+    <div class="card" role="button" tabindex="0" aria-label="${esc(m.name)}" data-id="${m.id}">
+      <div class="card__img-wrap">
+        <img src="${m.image}" alt="${esc(m.name)}" loading="lazy" decoding="async" />
+      </div>
+      <p class="card__name">${esc(m.name)}</p>
+      <p class="card__date">${m.date}</p>
+    </div>
+  `).join('');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════════════
+   OVERLAY HELPERS
+════════════════════════════════════════════════ */
+function showOverlay(id) {
+  document.getElementById(id).classList.add('active');
+  document.getElementById('fab').style.display = 'none';
+}
+function hideOverlay(id) {
+  document.getElementById(id).classList.remove('active');
+}
+function hideAll() {
+  ['camera-overlay','processing-overlay','review-overlay'].forEach(hideOverlay);
+  document.getElementById('fab').style.display = 'flex';
+}
+
+/* ════════════════════════════════════════════════
+   STEP 1 — CAMERA
+════════════════════════════════════════════════ */
 let stream = null;
 
-/* Open camera overlay, request rear lens */
 async function openCamera() {
-  const overlay = document.getElementById('camera-overlay');
-  const video   = document.getElementById('camera-video');
-  const denied  = document.getElementById('cam-denied');
+  const video  = document.getElementById('camera-video');
+  const denied = document.getElementById('cam-denied');
 
-  overlay.classList.add('active');
-  document.getElementById('fab').style.display = 'none';
-
+  showOverlay('camera-overlay');
   denied.classList.remove('visible');
   video.style.display = 'block';
 
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'environment' },  /* rear camera */
-        width:  { ideal: 1920 },
-        height: { ideal: 1920 },
-      },
+      video: { facingMode: { ideal:'environment' }, width:{ideal:1920}, height:{ideal:1920} },
       audio: false,
     });
     video.srcObject = stream;
   } catch (err) {
-    console.warn('[camera]', err.name, err.message);
+    console.warn('[camera]', err.name);
     video.style.display = 'none';
     denied.classList.add('visible');
   }
 }
 
-/* Stop stream and close overlay */
-function closeCamera() {
+function stopCamera() {
   if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
   document.getElementById('camera-video').srcObject = null;
-  document.getElementById('camera-overlay').classList.remove('active');
-  document.getElementById('fab').style.display = 'flex';
 }
 
-/* Capture current video frame → JPEG dataURL */
 function captureFrame() {
   const video  = document.getElementById('camera-video');
   const canvas = document.getElementById('capture-canvas');
-
-  // Square-crop from the centre of the frame
   const vw = video.videoWidth  || 1280;
   const vh = video.videoHeight || 1280;
   const side = Math.min(vw, vh);
-  const sx = (vw - side) / 2;
-  const sy = (vh - side) / 2;
-
-  canvas.width  = 1024;
-  canvas.height = 1024;
-  canvas
-    .getContext('2d')
-    .drawImage(video, sx, sy, side, side, 0, 0, 1024, 1024);
-
+  canvas.width = canvas.height = 1024;
+  canvas.getContext('2d').drawImage(video, (vw-side)/2, (vh-side)/2, side, side, 0, 0, 1024, 1024);
   return canvas.toDataURL('image/jpeg', 0.92);
 }
 
-/* ── Step 1 complete: photo captured ─────────────────────────── */
-function onPhotoCaptured(dataURL) {
-  closeCamera();
-  // dataURL is the raw JPEG — Step 2 (bg removal) will receive it
-  console.log('[step1] photo captured, size:', Math.round(dataURL.length / 1024), 'KB');
-  // TODO: hand off to Step 2
-  alert('📸 Photo captured! Step 2 (background removal) coming next.');
+/* ════════════════════════════════════════════════
+   STEP 2 — BACKGROUND REMOVAL
+   Uses @imgly/background-removal — 100% in-browser,
+   no API key, no server, completely free.
+════════════════════════════════════════════════ */
+let _removeBackground = null;
+
+async function getBgRemover() {
+  if (_removeBackground) return _removeBackground;
+  // Dynamically import the ESM library from jsDelivr CDN
+  const mod = await import(
+    'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/background-removal.js'
+  );
+  _removeBackground = mod.removeBackground;
+  return _removeBackground;
 }
 
-/* ── Event listeners ─────────────────────────────────────────── */
-document.getElementById('fab').addEventListener('click', openCamera);
-document.getElementById('camera-close').addEventListener('click', closeCamera);
-document.getElementById('shutter-btn').addEventListener('click', () => {
+async function removeBackground(jpegDataURL) {
+  const removeBackground = await getBgRemover();
+
+  // Config: load WASM + model files from the same CDN package
+  const config = {
+    publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/',
+    debug: false,
+  };
+
+  // Convert data URL → Blob for the library
+  const res  = await fetch(jpegDataURL);
+  const blob = await res.blob();
+
+  // Returns a PNG Blob with transparent background
+  const resultBlob = await removeBackground(blob, config);
+  return URL.createObjectURL(resultBlob);
+}
+
+/* ════════════════════════════════════════════════
+   STEP 3 — REVIEW
+════════════════════════════════════════════════ */
+let _pendingObjectURL = null;  // objectURL for the bg-removed PNG
+
+function showReview(objectURL) {
+  // Revoke previous to avoid memory leaks
+  if (_pendingObjectURL && _pendingObjectURL !== objectURL) {
+    URL.revokeObjectURL(_pendingObjectURL);
+  }
+  _pendingObjectURL = objectURL;
+
+  document.getElementById('review-img').src = objectURL;
+  document.getElementById('name-input').value = '';
+  document.getElementById('name-input').placeholder = 'Name this object…';
+
+  hideOverlay('processing-overlay');
+  showOverlay('review-overlay');
+
+  // Auto-focus name input after short delay
+  setTimeout(() => document.getElementById('name-input').focus(), 300);
+}
+
+/* ════════════════════════════════════════════════
+   STEP 4 — SAVE TO LOCALSTORAGE
+════════════════════════════════════════════════ */
+async function saveMemory() {
+  const name = document.getElementById('name-input').value.trim() || 'My Object';
+  const objectURL = _pendingObjectURL;
+  if (!objectURL) return;
+
+  // Convert objectURL blob → base64 data URL for persistent storage
+  const res    = await fetch(objectURL);
+  const blob   = await res.blob();
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const dataURL = reader.result;
+    const memories = loadMemories().length ? loadMemories() : SEED;
+    const newMemory = {
+      id:    Date.now(),
+      name:  name,
+      date:  fmtFull(new Date()),
+      image: dataURL,
+    };
+    memories.push(newMemory);
+    saveMemories(memories);
+
+    // Clean up objectURL
+    URL.revokeObjectURL(objectURL);
+    _pendingObjectURL = null;
+
+    hideAll();
+    renderGrid();
+  };
+  reader.readAsDataURL(blob);
+}
+
+/* ════════════════════════════════════════════════
+   FULL FLOW
+════════════════════════════════════════════════ */
+async function onShutterPressed() {
   if (!stream) return;
-  const dataURL = captureFrame();
-  onPhotoCaptured(dataURL);
+
+  // 1. Capture frame from video
+  const jpegDataURL = captureFrame();
+  stopCamera();
+  hideOverlay('camera-overlay');
+
+  // 2. Show processing spinner
+  showOverlay('processing-overlay');
+
+  try {
+    // 3. Remove background in browser (may download ~20MB models on first use)
+    const objectURL = await removeBackground(jpegDataURL);
+
+    // 4. Show review screen
+    showReview(objectURL);
+  } catch (err) {
+    console.error('[bg-removal]', err);
+    // Fallback: skip bg removal, go straight to review with original image
+    showReview(jpegDataURL);
+  }
+}
+
+/* ════════════════════════════════════════════════
+   EVENTS
+════════════════════════════════════════════════ */
+document.getElementById('fab').addEventListener('click', openCamera);
+document.getElementById('camera-close').addEventListener('click', () => { stopCamera(); hideAll(); });
+document.getElementById('shutter-btn').addEventListener('click', onShutterPressed);
+document.getElementById('review-close').addEventListener('click', hideAll);
+
+// Retake: go back to camera
+document.getElementById('retake-btn').addEventListener('click', () => {
+  hideOverlay('review-overlay');
+  openCamera();
 });
 
-/* Escape key closes camera */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeCamera();
+// Save
+document.getElementById('save-btn').addEventListener('click', saveMemory);
+
+// Enter key in name field saves
+document.getElementById('name-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); saveMemory(); }
 });
+
+// Escape closes everything
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { stopCamera(); hideAll(); }
+});
+
+// Pre-warm the bg-removal library in the background after page load
+// so the first capture feels faster
+window.addEventListener('load', () => {
+  setTimeout(() => getBgRemover().catch(() => {}), 3000);
+});
+
+/* ════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════ */
+renderGrid();
 </script>
 </body>
 </html>
