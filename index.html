@@ -3,51 +3,79 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#faf8f6" />
+  <meta name="theme-color" content="#edecea" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Memories</title>
   <style>
-    /* ── Design Tokens ───────────────────────────────────────────── */
+    /* ── Design Tokens — Layer 1 ────────────────────────────────── */
+    /*
+     * Source: CapWords visual reference (screenshot analysis)
+     * Background is warm light grey #edecea — NOT white, NOT cream
+     * Dots are baked into the bg (no separate opacity layer)
+     * Object names: weight 800 (heavy/chunky, like CapWords)
+     * Accent: warm orange #f5a742 (active tab, FAB, confirm btn)
+     */
     :root {
-      --color-bg-light:        #faf8f6;
-      --color-bg-dark:         #f5f2ef;
-      --color-text-primary:    #1a1a1a;
-      --color-text-secondary:  #999;
-      --color-text-tertiary:   #bbb;
-      --color-accent-warm:     #e8b4a8;
-      --color-accent-warm-dk:  #d9a896;
-      --color-glass:           rgba(255,255,255,0.5);
+      /* ── Backgrounds ── */
+      --color-bg:          #edecea;   /* warm light grey — the actual CapWords bg */
+      --color-surface:     #e6e3e0;   /* slightly darker surface (cards, inputs) */
+      --color-dot:         #ccc8c2;   /* dots baked in, no opacity hack needed */
+
+      /* ── Text ── */
+      --color-text-primary:    #111111;  /* near-black, slightly deeper than #1a1a1a */
+      --color-text-secondary:  #888888;  /* dates, subtitles */
+      --color-text-tertiary:   #bbbbbb;  /* placeholder, dimmed */
+
+      /* ── Accent (warm orange) ── */
+      --color-accent:          #f5a742;
+      --color-accent-dark:     #e8962e;  /* pressed state */
+      --color-accent-glow:     rgba(245,167,66,0.30);
+
+      /* ── Neutrals ── */
+      --color-btn-neutral:     #e8e5e1;  /* replay/reject button bg */
+      --color-input-bg:        #e6e3e0;  /* name input on grey bg */
       --color-camera-bg:       #1a1a1a;
 
+      /* ── Typography ── */
       --font:    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --fs-xs:   11px;
       --fs-sm:   13px;
       --fs-base: 14px;
-      --fs-lg:   28px;
-      --fs-xl:   32px;
+      --fs-md:   15px;
+      --fs-lg:   22px;
+      --fs-xl:   28px;
       --fw-reg:  400;
       --fw-med:  500;
       --fw-semi: 600;
+      --fw-bold: 800;   /* ← object names — matches CapWords chunky weight */
 
-      --sp-xs:  8px;
-      --sp-sm:  12px;
-      --sp-md:  16px;
-      --sp-lg:  20px;
-      --sp-xl:  24px;
-      --sp-2xl: 32px;
-      --sp-3xl: 48px;
+      /* ── Spacing ── */
+      --sp-xs:  4px;
+      --sp-sm:  8px;
+      --sp-md:  12px;
+      --sp-lg:  16px;
+      --sp-xl:  20px;
+      --sp-2xl: 24px;
+      --sp-3xl: 32px;
+      --sp-4xl: 48px;
 
-      --r-md:   24px;
+      /* ── Radii ── */
+      --r-sm:   12px;
+      --r-md:   20px;
       --r-full: 50%;
 
-      --sh-subtle: 0 2px 8px rgba(0,0,0,0.05);
-      --sh-sm:     0 2px 8px rgba(0,0,0,0.10);
-      --sh-md:     0 4px 12px rgba(0,0,0,0.08);
-      --sh-lg:     0 8px 24px rgba(232,180,168,0.30);
+      /* ── Shadows ── */
+      /* On grey bg, shadows need slightly more presence */
+      --sh-object:  drop-shadow(0 6px 18px rgba(0,0,0,0.14));
+      --sh-btn:     0 4px 14px rgba(0,0,0,0.10);
+      --sh-fab:     0 6px 20px rgba(245,167,66,0.35);
+      --sh-close:   0 1px 6px rgba(0,0,0,0.12);
 
-      --tx-fast: 0.2s ease;
-      --tx-base: 0.3s ease;
+      /* ── Transitions ── */
+      --tx-fast: 0.15s ease;
+      --tx-base: 0.2s ease;
+      --tx-slow: 0.3s ease;
     }
 
     /* ── Reset ───────────────────────────────────────────────────── */
@@ -61,18 +89,22 @@
 
     body {
       font-family: var(--font);
-      background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-dark) 100%);
-      background-attachment: fixed;
+      background-color: var(--color-bg);   /* solid warm grey — no gradient */
       color: var(--color-text-primary);
-      overflow: hidden;          /* grid-view scrolls internally */
+      overflow: hidden;
     }
 
-    /* ── Dotted texture layer ─────────────────────────────────────── */
+    /* ── Dotted texture — baked in, no opacity layer ──────────────── */
+    /*
+     * Dots are the same warm-grey family as the bg.
+     * Color baked in (#ccc8c2) rather than using opacity,
+     * so they show correctly on the grey background.
+     * 1px dot at 28px spacing matches the CapWords density.
+     */
     #dots {
       position: fixed; inset: 0; z-index: 0;
-      background-image: radial-gradient(circle, #d9cfc5 0.5px, transparent 0.5px);
-      background-size: 24px 24px;
-      opacity: .12;
+      background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
+      background-size: 28px 28px;
       pointer-events: none;
     }
 

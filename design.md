@@ -42,50 +42,65 @@ Directly inspired by CapWords. The background is pure white — nothing competes
 
 ## 2. Color Palette
 
+> **Layer 1 — verified against CapWords screenshot (May 19 grid view)**
+
 ### 2.1 Base Colors
 
 | Token | Hex | RGB | Usage |
 |-------|-----|-----|-------|
-| White | `#ffffff` | 255, 255, 255 | **Primary background (all screens)** |
-| Off-white | `#f7f7f7` | 247, 247, 247 | Secondary surfaces, tab bar bg |
-| Text primary | `#1a1a1a` | 26, 26, 26 | Object names, headings |
-| Text secondary | `#999999` | 153, 153, 153 | Dates, subtitles, hints |
-| Text tertiary | `#bbbbbb` | 187, 187, 187 | Placeholder, dimmed labels |
-| Divider | `#eeeeee` | 238, 238, 238 | Hairline separators |
+| `--color-bg` | `#edecea` | 237, 236, 234 | **Primary background — warm light grey, all screens** |
+| `--color-surface` | `#e6e3e0` | 230, 227, 224 | Cards, input fields, secondary surfaces |
+| `--color-dot` | `#ccc8c2` | 204, 200, 194 | Dot texture — baked in (no opacity hack) |
+| `--color-text-primary` | `#111111` | 17, 17, 17 | Object names, headings — near-black |
+| `--color-text-secondary` | `#888888` | 136, 136, 136 | Dates, subtitles, counts |
+| `--color-text-tertiary` | `#bbbbbb` | 187, 187, 187 | Placeholder, dimmed labels |
+
+> ⚠️ Background is **NOT white** and **NOT cream**. It is a warm light grey.
+> The dotted texture uses a baked-in color, not an opacity overlay, so it reads correctly on grey.
 
 ### 2.2 Accent — Warm Orange
 
-The single primary action color. Used for: active tab, confirm button, FAB.
+Single primary action color. Active tab, FAB, confirm (✓) button.
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| Orange | `#f5a742` | Active tab icon, confirm (✓) button fill |
-| Orange dark | `#e8962e` | Button pressed state |
-| Orange glow | `rgba(245,167,66,0.15)` | FAB shadow |
+| `--color-accent` | `#f5a742` | FAB, confirm button, active tab |
+| `--color-accent-dark` | `#e8962e` | Pressed/active state |
+| `--color-accent-glow` | `rgba(245,167,66,0.30)` | FAB box-shadow |
 
-### 2.3 Category Tile Colors
+### 2.3 Neutral UI Colors
 
-Each category has a fixed muted pastel. Used as solid tile backgrounds with white text.
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `--color-btn-neutral` | `#e8e5e1` | Replay / reject button bg (slightly darker than bg) |
+| `--color-input-bg` | `#e6e3e0` | Name input field bg |
+| `--color-camera-bg` | `#1a1a1a` | Video preview background |
 
-| Category | Hex | RGB | Appearance |
-|----------|-----|-----|------------|
-| Food & Drinks | `#9585bf` | 149, 133, 191 | Dusty purple |
-| People & Family | `#7fa0c0` | 127, 160, 192 | Muted blue |
-| Body & Health | `#9a7aaa` | 154, 122, 170 | Soft plum |
-| Animals & Nature | `#8a9a64` | 138, 154, 100 | Olive green |
-| Home & Furniture | `#b07882` | 176, 120, 130 | Dusty rose |
-| School & Study | `#a89060` | 168, 144, 96 | Warm tan |
+### 2.4 Category Tile Colors
 
-### 2.4 Functional Colors
+Each category has a fixed muted pastel. Solid bg, white text on top.
 
-| Element | Color | Notes |
-|---------|-------|-------|
-| Camera background | `#1a1a1a` | Video preview bg |
-| Review glow | `rgba(255, 220, 100, 0.35)` | Warm yellow radial glow behind object |
-| Replay button | `#efefef` | Light grey circle |
-| Reject button (✕) | `#efefef` | Light grey circle |
-| Confirm button (✓) | `#f5a742` | Orange fill, white icon |
-| Tab bar background | `#ffffff` | + top border `#eeeeee` |
+| Category | Token | Hex | Appearance |
+|----------|-------|-----|------------|
+| Food & Drinks | `--color-cat-food` | `#9585bf` | Dusty purple |
+| People & Family | `--color-cat-people` | `#7fa0c0` | Muted blue |
+| Body & Health | `--color-cat-body` | `#9a7aaa` | Soft plum |
+| Animals & Nature | `--color-cat-nature` | `#8a9a64` | Olive green |
+| Home & Furniture | `--color-cat-home` | `#b07882` | Dusty rose |
+| School & Study | `--color-cat-school` | `#a89060` | Warm tan |
+
+### 2.5 Dot Texture Spec
+
+```css
+/* On body or fixed layer — no opacity modifier */
+background-image: radial-gradient(circle, #ccc8c2 1px, transparent 1px);
+background-size: 28px 28px;
+```
+
+- Dot size: **1px** (slightly larger than old 0.5px — more visible on grey bg)
+- Dot spacing: **28px**
+- Color: `#ccc8c2` — same warm-grey family, ~10% darker than bg
+- **No `opacity` property needed** — color is calibrated directly
 
 ---
 
@@ -577,49 +592,52 @@ Out of scope for V1. Not designed.
 
 ## 11. Design Tokens (CSS Variables)
 
+> **Layer 1 — these are the canonical values. All components derive from these.**
+
 ```css
 :root {
-  /* Background */
-  --color-bg:             #ffffff;
-  --color-surface:        #f7f7f7;
-  --color-divider:        #eeeeee;
+  /* ── Backgrounds ───────────────────────────────────────────── */
+  --color-bg:              #edecea;  /* warm light grey — primary bg */
+  --color-surface:         #e6e3e0;  /* cards, inputs, secondary surfaces */
+  --color-dot:             #ccc8c2;  /* dot texture (baked, no opacity) */
 
-  /* Text */
-  --color-text-primary:   #1a1a1a;
-  --color-text-secondary: #999999;
-  --color-text-tertiary:  #bbbbbb;
+  /* ── Text ──────────────────────────────────────────────────── */
+  --color-text-primary:    #111111;  /* near-black object names */
+  --color-text-secondary:  #888888;  /* dates, subtitles */
+  --color-text-tertiary:   #bbbbbb;  /* placeholders, dimmed */
 
-  /* Accent */
-  --color-accent:         #f5a742;
-  --color-accent-dark:    #e8962e;
-  --color-accent-glow:    rgba(245,167,66,0.35);
+  /* ── Accent ────────────────────────────────────────────────── */
+  --color-accent:          #f5a742;  /* FAB, confirm btn, active tab */
+  --color-accent-dark:     #e8962e;  /* pressed state */
+  --color-accent-glow:     rgba(245,167,66,0.30);
 
-  /* Category tiles */
-  --color-cat-food:       #9585bf;
-  --color-cat-people:     #7fa0c0;
-  --color-cat-body:       #9a7aaa;
-  --color-cat-nature:     #8a9a64;
-  --color-cat-home:       #b07882;
-  --color-cat-school:     #a89060;
+  /* ── Neutral UI ─────────────────────────────────────────────── */
+  --color-btn-neutral:     #e8e5e1;  /* replay / reject buttons */
+  --color-input-bg:        #e6e3e0;  /* name input bg */
+  --color-camera-bg:       #1a1a1a;  /* video preview */
 
-  /* Functional */
-  --color-camera-bg:      #1a1a1a;
-  --color-btn-neutral:    #efefef;
+  /* ── Category tiles ─────────────────────────────────────────── */
+  --color-cat-food:        #9585bf;
+  --color-cat-people:      #7fa0c0;
+  --color-cat-body:        #9a7aaa;
+  --color-cat-nature:      #8a9a64;
+  --color-cat-home:        #b07882;
+  --color-cat-school:      #a89060;
 
-  /* Typography */
-  --font:         -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --fs-xs:        11px;
-  --fs-sm:        13px;
-  --fs-base:      14px;
-  --fs-md:        15px;
-  --fs-lg:        17px;
-  --fs-xl:        22px;
-  --fs-2xl:       28px;
-  --fw-regular:   400;
-  --fw-semibold:  600;
-  --fw-bold:      700;   /* ← object names */
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font:     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fs-xs:    11px;
+  --fs-sm:    13px;
+  --fs-base:  14px;
+  --fs-md:    15px;
+  --fs-lg:    22px;
+  --fs-xl:    28px;
+  --fw-reg:   400;
+  --fw-med:   500;
+  --fw-semi:  600;
+  --fw-bold:  800;   /* ← object names — heavy/chunky like CapWords */
 
-  /* Spacing */
+  /* ── Spacing (4px base) ─────────────────────────────────────── */
   --sp-xs:   4px;
   --sp-sm:   8px;
   --sp-md:   12px;
@@ -629,19 +647,20 @@ Out of scope for V1. Not designed.
   --sp-3xl:  32px;
   --sp-4xl:  48px;
 
-  /* Radii */
+  /* ── Radii ───────────────────────────────────────────────────── */
   --r-sm:    12px;
   --r-md:    20px;
-  --r-lg:    24px;
   --r-full:  50%;
 
-  /* Shadows */
-  --sh-object:    drop-shadow(0 6px 16px rgba(0,0,0,0.12));
-  --sh-object-lg: drop-shadow(0 8px 20px rgba(0,0,0,0.15));
-  --sh-fab:       0 6px 20px rgba(245,167,66,0.35);
-  --sh-close:     0 1px 6px rgba(0,0,0,0.10);
+  /* ── Shadows ─────────────────────────────────────────────────── */
+  /* Slightly stronger on grey bg — shadow is the only depth cue in grid */
+  --sh-object:   drop-shadow(0 6px 18px rgba(0,0,0,0.14));
+  --sh-object-lg: drop-shadow(0 8px 22px rgba(0,0,0,0.16));
+  --sh-btn:      0 4px 14px rgba(0,0,0,0.10);
+  --sh-fab:      0 6px 20px rgba(245,167,66,0.35);
+  --sh-close:    0 1px 6px rgba(0,0,0,0.12);
 
-  /* Transitions */
+  /* ── Transitions ─────────────────────────────────────────────── */
   --tx-fast:  0.15s ease;
   --tx-base:  0.2s ease;
   --tx-slow:  0.3s ease;
