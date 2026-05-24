@@ -211,6 +211,7 @@
       width: 100%; height: 100%;
       object-fit: contain;
       filter: var(--sh-object);
+      mix-blend-mode: multiply;
     }
 
     /* Name input */
@@ -547,7 +548,8 @@ async function onShutterPressed() {
     // 4. Show review screen
     showReview(objectURL);
   } catch (err) {
-    console.error('[bg-removal]', err);
+    console.error('[bg-removal]', err.message || err);
+    alert(`⚠️ Background removal failed (${err.message || 'unknown error'})\n\nShowing original image. Check console for details.`);
     // Fallback: skip bg removal, go straight to review with original image
     showReview(jpegDataURL);
   }
