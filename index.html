@@ -436,80 +436,110 @@ function captureFrame() {
 
 /* ════════════════════════════════════════════════
    STEP 2 — BACKGROUND REMOVAL
-   Uses @imgly/background-removal — 100% in-browser,
+   Uses MediaPipe Selfie Segmentation — 100% in-browser,
    no API key, no server, completely free.
 ════════════════════════════════════════════════ */
-let _removeBackground = null;
+let _segmenter = null;
 
-async function getBgRemover() {
-  if (_removeBackground) return _removeBackground;
-  // Try unpkg CDN (more reliable for model files)
-  try {
-    console.log('[imgly] Importing library from unpkg...');
-    const mod = await import(
-      'https://unpkg.com/@imgly/background-removal@1.7.0/dist/index.mjs'
-    );
-    console.log('[imgly] Import successful, exports:', Object.keys(mod));
-    _removeBackground = mod.removeBackground || mod.default;
-    if (!_removeBackground) {
-      throw new Error('removeBackground export not found in module');
-    }
-    return _removeBackground;
-  } catch (err) {
-    console.error('[imgly] Import failed:', err.message || err);
-    throw err;
-  }
+async function initSegmenter() {
+  if (_segmenter) return _segmenter;
+  console.log('[mediapipe] Loading Selfie Segmentation...');
+
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/selfie_segmentation.js';
+  await new Promise((resolve, reject) => {
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+
+  // Initialize segmenter
+  const SelfieSegmentation = window.SelfieSegmentation;
+  const segmenter = new SelfieSegmentation({
+    locateFile: (file) =>
+      `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/${file}`
+  });
+
+  await segmenter.initialize();
+  console.log('[mediapipe] Selfie Segmentation ready');
+  _segmenter = segmenter;
+  return segmenter;
 }
 
 async function removeBackground(jpegDataURL) {
-  const removeBg = await getBgRemover();
+  const segmenter = await initSegmenter();
 
-  // Config: try different publicPath - models may be in different location
-  const config = {
-    publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/',
-    proxyToWorker: true,
-    debug: true,
-  };
-
-  // Convert data URL → Blob for the library
+  // Fetch image
   const res = await fetch(jpegDataURL);
   const blob = await res.blob();
+  const img = new Image();
 
-  console.log('[imgly] Processing image, blob size:', blob.size);
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+    img.src = URL.createObjectURL(blob);
+  });
 
-  try {
-    // Try different API patterns depending on library version
-    let resultBlob;
-    if (typeof removeBg === 'function') {
-      // Direct function call
-      resultBlob = await removeBg(blob, config);
-    } else if (removeBg.removeBackground) {
-      // Named export method
-      resultBlob = await removeBg.removeBackground(blob, config);
-    } else {
-      throw new Error('Cannot find removeBackground method');
-    }
+  console.log('[mediapipe] Processing image...');
 
-    console.log('[imgly] Processing complete, result size:', resultBlob?.size);
-    return URL.createObjectURL(resultBlob);
-  } catch (err) {
-    console.error('[imgly] Processing error:', err.message);
-    throw err;
+  // Create canvas for segmentation
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext('2d');
+
+  // Draw image
+  ctx.drawImage(img, 0, 0);
+
+  // Get segmentation
+  const results = await segmenter.segmentForImage(img);
+  const mask = results.segmentationMask;
+
+  // Create output canvas with transparency
+  const output = document.createElement('canvas');
+  output.width = img.width;
+  output.height = img.height;
+  const outCtx = output.getContext('2d');
+
+  // Draw image + apply mask
+  outCtx.drawImage(img, 0, 0);
+  const imageData = outCtx.getImageData(0, 0, output.width, output.height);
+  const data = imageData.data;
+  const maskData = mask.data;
+
+  // Apply mask to alpha channel
+  for (let i = 0; i < maskData.length; i++) {
+    const confidence = maskData[i];
+    const alphaIdx = i * 4 + 3;
+    data[alphaIdx] = Math.round(confidence * 255);
   }
+
+  outCtx.putImageData(imageData, 0, 0);
+
+  console.log('[mediapipe] Processing complete');
+
+  // Convert to PNG blob
+  return new Promise(resolve => {
+    output.toBlob(resolve, 'image/png');
+  });
 }
 
 /* ════════════════════════════════════════════════
    STEP 3 — REVIEW
 ════════════════════════════════════════════════ */
-let _pendingObjectURL = null;  // objectURL for the bg-removed PNG
+let _pendingBlob = null;  // Blob for the bg-removed image
 
-function showReview(objectURL) {
+function showReview(blob) {
   // Revoke previous to avoid memory leaks
-  if (_pendingObjectURL && _pendingObjectURL !== objectURL) {
-    URL.revokeObjectURL(_pendingObjectURL);
+  if (_pendingBlob && _pendingBlob !== blob) {
+    if (_pendingBlob instanceof Blob) {
+      const url = document.getElementById('review-img').src;
+      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+    }
   }
-  _pendingObjectURL = objectURL;
+  _pendingBlob = blob;
 
+  const objectURL = URL.createObjectURL(blob);
   document.getElementById('review-img').src = objectURL;
   document.getElementById('name-input').value = '';
   document.getElementById('name-input').placeholder = 'Name this object…';
@@ -526,12 +556,10 @@ function showReview(objectURL) {
 ════════════════════════════════════════════════ */
 async function saveMemory() {
   const name = document.getElementById('name-input').value.trim() || 'My Object';
-  const objectURL = _pendingObjectURL;
-  if (!objectURL) return;
+  const blob = _pendingBlob;
+  if (!blob) return;
 
-  // Convert objectURL blob → base64 data URL for persistent storage
-  const res    = await fetch(objectURL);
-  const blob   = await res.blob();
+  // Convert blob → base64 data URL for persistent storage
   const reader = new FileReader();
 
   reader.onload = () => {
@@ -546,9 +574,7 @@ async function saveMemory() {
     memories.push(newMemory);
     saveMemories(memories);
 
-    // Clean up objectURL
-    URL.revokeObjectURL(objectURL);
-    _pendingObjectURL = null;
+    _pendingBlob = null;
 
     hideAll();
     renderGrid();
@@ -571,16 +597,18 @@ async function onShutterPressed() {
   showOverlay('processing-overlay');
 
   try {
-    // 3. Remove background in browser (may download ~20MB models on first use)
-    const objectURL = await removeBackground(jpegDataURL);
+    // 3. Remove background in browser
+    const blob = await removeBackground(jpegDataURL);
 
     // 4. Show review screen
-    showReview(objectURL);
+    showReview(blob);
   } catch (err) {
-    console.error('[bg-removal]', err.message || err);
+    console.error('[mediapipe]', err.message || err);
     alert(`⚠️ Background removal failed (${err.message || 'unknown error'})\n\nShowing original image. Check console for details.`);
-    // Fallback: skip bg removal, go straight to review with original image
-    showReview(jpegDataURL);
+    // Fallback: convert original JPEG to blob and show
+    const res = await fetch(jpegDataURL);
+    const fallbackBlob = await res.blob();
+    showReview(fallbackBlob);
   }
 }
 
@@ -611,10 +639,9 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { stopCamera(); hideAll(); }
 });
 
-// Pre-warm the bg-removal library in the background after page load
-// so the first capture feels faster
+// Pre-warm the segmentation model after page load for faster first capture
 window.addEventListener('load', () => {
-  setTimeout(() => getBgRemover().catch(() => {}), 3000);
+  setTimeout(() => initSegmenter().catch(() => {}), 2000);
 });
 
 /* ════════════════════════════════════════════════
