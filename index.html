@@ -7,12 +7,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Memories</title>
-  <!-- Nunito ExtraBold (800) — for object name labels -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&display=swap" rel="stylesheet" />
   <style>
-    /* ── Layer 1: Design Tokens ──────────────────────────────────── */
+    /* ── Layer 1: Tokens ─────────────────────────────────────────── */
     :root {
       --color-bg:             #edecea;
       --color-dot:            #ccc8c2;
@@ -21,32 +20,22 @@
       --color-text-tertiary:  #bbbbbb;
       --color-accent:         #f5a742;
       --color-accent-glow:    rgba(245,167,66,0.30);
+      --color-camera-bg:      #000000;
 
       --font:         -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --font-display: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
-      --fs-xs:    11px;
-      --fs-sm:    13px;
-      --fs-base:  14px;
-      --fs-md:    15px;
-      --fs-xl:    28px;
-      --fw-reg:   400;
-      --fw-semi:  600;
-      --fw-bold:  800;
+      --fs-xs:  11px;  --fs-sm:  13px;  --fs-base: 14px;
+      --fs-md:  15px;  --fs-xl:  28px;
+      --fw-reg: 400;   --fw-semi: 600;  --fw-bold: 800;
 
-      --sp-sm:   8px;
-      --sp-md:   12px;
-      --sp-lg:   16px;
-      --sp-xl:   20px;
-      --sp-2xl:  24px;
-      --sp-3xl:  32px;
+      --sp-sm: 8px;  --sp-md: 12px;  --sp-lg: 16px;
+      --sp-xl: 20px; --sp-2xl: 24px; --sp-3xl: 32px;
 
-      --r-md:    20px;
-      --r-full:  50%;
+      --r-md: 20px; --r-full: 50%;
 
       --sh-object: drop-shadow(0 6px 18px rgba(0,0,0,0.14));
       --sh-fab:    0 6px 20px rgba(245,167,66,0.35);
-
-      --tx-base: 0.2s ease;
+      --tx-base:   0.2s ease;
     }
 
     /* ── Reset ───────────────────────────────────────────────────── */
@@ -56,13 +45,11 @@
     }
     html, body { height: 100%; }
 
-    /* ── Base ────────────────────────────────────────────────────── */
     body {
       font-family: var(--font);
       background-color: var(--color-bg);
       color: var(--color-text-primary);
       overflow: hidden;
-      /* Mobile-first: cap width so it never exceeds a phone screen */
       max-width: 430px;
       margin: 0 auto;
       position: relative;
@@ -82,10 +69,8 @@
     #home {
       position: fixed;
       top: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 430px;
-      bottom: 0;
-      z-index: 1;
-      overflow-y: auto;
+      width: 100%; max-width: 430px; bottom: 0;
+      z-index: 1; overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       padding:
         calc(var(--sp-2xl) + env(safe-area-inset-top,    0px))
@@ -94,91 +79,51 @@
         calc(var(--sp-lg)  + env(safe-area-inset-left,   0px));
     }
 
-    /* ── Header ──────────────────────────────────────────────────── */
-    .header {
-      margin-bottom: var(--sp-3xl);
-    }
-    .header__date {
-      font-size: var(--fs-sm);
-      font-weight: var(--fw-reg);
-      color: var(--color-text-secondary);
-      margin-bottom: 4px;
-    }
-    .header__title {
-      font-size: var(--fs-xl);
-      font-weight: var(--fw-reg);
-      letter-spacing: -0.5px;
-      color: var(--color-text-primary);
-      line-height: 1.15;
-    }
-    .header__count {
-      font-size: var(--fs-sm);
-      color: var(--color-text-secondary);
-      margin-top: 4px;
-    }
+    .header { margin-bottom: var(--sp-3xl); }
+    .header__date  { font-size: var(--fs-sm); color: var(--color-text-secondary); margin-bottom: 4px; }
+    .header__title { font-size: var(--fs-xl); font-weight: var(--fw-reg); letter-spacing: -0.5px; line-height: 1.15; }
+    .header__count { font-size: var(--fs-sm); color: var(--color-text-secondary); margin-top: 4px; }
 
-    /* ── Grid ────────────────────────────────────────────────────── */
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       column-gap: var(--sp-lg);
-      row-gap: var(--sp-3xl);   /* generous vertical gap — breathing room */
+      row-gap: var(--sp-3xl);
     }
 
-    /* ── Memory Card ─────────────────────────────────────────────── */
-    /*
-     * NO card container. Objects float directly on the grey bg.
-     * mix-blend-mode: multiply makes white photo backgrounds
-     * disappear against the grey — same trick as CapWords.
-     */
     .card {
-      cursor: pointer;
-      user-select: none;
+      cursor: pointer; user-select: none;
       transition: transform var(--tx-base);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: flex; flex-direction: column; align-items: center;
     }
     .card:active { transform: scale(0.97); }
 
     .card__img-wrap {
-      width: 100%;
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 100%; aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
     }
     .card__img-wrap img {
-      width: 90%;
-      height: 90%;
+      width: 90%; height: 90%;
       object-fit: contain;
       filter: var(--sh-object);
-      mix-blend-mode: multiply;   /* white bg → transparent on grey */
+      mix-blend-mode: multiply;
     }
 
     .card__name {
-      font-family: var(--font-display);   /* Nunito ExtraBold */
-      font-size: var(--fs-md);
-      font-weight: var(--fw-bold);        /* 800 */
-      letter-spacing: -0.2px;
-      color: var(--color-text-primary);
-      text-align: center;
-      margin-top: var(--sp-sm);
-      line-height: 1.2;
+      font-family: var(--font-display);
+      font-size: var(--fs-md); font-weight: var(--fw-bold);
+      letter-spacing: -0.2px; color: var(--color-text-primary);
+      text-align: center; margin-top: var(--sp-sm); line-height: 1.2;
     }
     .card__date {
-      font-size: var(--fs-xs);
-      font-weight: var(--fw-reg);
-      color: var(--color-text-tertiary);
-      text-align: center;
-      margin-top: 4px;
+      font-size: var(--fs-xs); color: var(--color-text-tertiary);
+      text-align: center; margin-top: 4px;
     }
 
     /* ── FAB ─────────────────────────────────────────────────────── */
     #fab {
       position: fixed;
       bottom: calc(var(--sp-2xl) + env(safe-area-inset-bottom, 0px));
-      /* Keep FAB inside the 430px mobile column */
       right: max(calc(var(--sp-xl) + env(safe-area-inset-right, 0px)),
                  calc(50vw - 215px + var(--sp-xl)));
       width: 58px; height: 58px;
@@ -193,6 +138,88 @@
       user-select: none;
     }
     #fab:active { transform: scale(0.95); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       STEP 1 — CAMERA OVERLAY
+       Full-screen black overlay. Video fills the screen edge-to-edge.
+       Shutter button at bottom centre. Close top-left.
+    ═══════════════════════════════════════════════════════════════ */
+    #camera-overlay {
+      display: none;               /* shown via .active */
+      position: fixed;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; height: 100%;
+      background: var(--color-camera-bg);
+      z-index: 200;
+      flex-direction: column;
+    }
+    #camera-overlay.active { display: flex; }
+
+    /* Live video — fills available space above controls */
+    #camera-video {
+      flex: 1;
+      width: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Bottom control bar */
+    .cam-controls {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+      padding-top: 24px;
+      background: var(--color-camera-bg);
+      position: relative;
+    }
+
+    /* Shutter button — classic camera style */
+    #shutter-btn {
+      width: 72px; height: 72px;
+      border-radius: var(--r-full);
+      background: #ffffff;
+      border: 4px solid rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: transform var(--tx-base), background var(--tx-base);
+      outline: none;
+      /* inner circle effect */
+      box-shadow: 0 0 0 3px #000, 0 0 0 6px rgba(255,255,255,0.35);
+    }
+    #shutter-btn:active { transform: scale(0.92); background: #ddd; }
+
+    /* Close button — top-left over video */
+    #camera-close {
+      position: absolute;
+      top: calc(16px + env(safe-area-inset-top, 0px));
+      left: 16px;
+      width: 40px; height: 40px;
+      border-radius: var(--r-full);
+      background: rgba(0,0,0,0.45);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: #fff;
+      z-index: 201;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    /* Camera permission denied state */
+    .cam-denied {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: var(--fs-sm);
+      text-align: center;
+      padding: 32px;
+      gap: 12px;
+    }
+    .cam-denied.visible { display: flex; }
+    .cam-denied span:first-child { font-size: 40px; }
   </style>
 </head>
 <body>
@@ -200,10 +227,9 @@
 <div id="dots" aria-hidden="true"></div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     HOME SCREEN
+     HOME
 ═══════════════════════════════════════════════════════════════ -->
 <main id="home">
-
   <header class="header">
     <p class="header__date" id="header-date"></p>
     <h1 class="header__title">Memories</h1>
@@ -211,7 +237,6 @@
   </header>
 
   <section class="grid" id="grid" aria-label="Memory collection">
-
     <div class="card" role="button" tabindex="0" aria-label="Vintage Key">
       <div class="card__img-wrap">
         <img src="assets/key.png" alt="Vintage Key" loading="eager" decoding="async" />
@@ -219,7 +244,6 @@
       <p class="card__name">Vintage Key</p>
       <p class="card__date" id="date-key"></p>
     </div>
-
     <div class="card" role="button" tabindex="0" aria-label="Blue Teapot">
       <div class="card__img-wrap">
         <img src="assets/teapot.png" alt="Blue Teapot" loading="eager" decoding="async" />
@@ -227,7 +251,6 @@
       <p class="card__name">Blue Teapot</p>
       <p class="card__date" id="date-teapot"></p>
     </div>
-
     <div class="card" role="button" tabindex="0" aria-label="Croissant">
       <div class="card__img-wrap">
         <img src="assets/croissant.png" alt="Croissant" loading="eager" decoding="async" />
@@ -235,7 +258,6 @@
       <p class="card__name">Croissant</p>
       <p class="card__date" id="date-croissant"></p>
     </div>
-
     <div class="card" role="button" tabindex="0" aria-label="Rubber Duck">
       <div class="card__img-wrap">
         <img src="assets/duck.png" alt="Rubber Duck" loading="eager" decoding="async" />
@@ -243,38 +265,136 @@
       <p class="card__name">Rubber Duck</p>
       <p class="card__date" id="date-duck"></p>
     </div>
-
   </section>
 </main>
 
-<button id="fab" aria-label="Add new memory">+</button>
+<button id="fab" aria-label="Capture new object">+</button>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STEP 1 — CAMERA OVERLAY
+═══════════════════════════════════════════════════════════════ -->
+<div id="camera-overlay" role="dialog" aria-modal="true" aria-label="Camera">
+
+  <button id="camera-close" aria-label="Close camera">✕</button>
+
+  <!-- Live feed -->
+  <video id="camera-video" autoplay playsinline muted></video>
+
+  <!-- Camera denied fallback -->
+  <div class="cam-denied" id="cam-denied">
+    <span>📷</span>
+    <span>Camera access was denied.<br>Please allow camera access in your browser settings.</span>
+  </div>
+
+  <!-- Shutter controls -->
+  <div class="cam-controls">
+    <button id="shutter-btn" aria-label="Take photo"></button>
+  </div>
+</div>
+
+<!-- Off-screen canvas for frame capture -->
+<canvas id="capture-canvas" style="display:none"></canvas>
 
 <script>
-  // ── Date helpers ────────────────────────────────────────────────
-  function fmtShort(d) {
-    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+'use strict';
+
+/* ── Helpers ─────────────────────────────────────────────────── */
+function fmtShort(d) { return d.toLocaleDateString('en-US', { month:'long', day:'numeric' }); }
+function fmtFull(d)  { return d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }); }
+
+/* ── Home dates ──────────────────────────────────────────────── */
+const today = new Date();
+document.getElementById('header-date').textContent  = fmtShort(today);
+document.getElementById('header-count').textContent = '4 objects collected';
+const dates = [3,5,8,11].map(n => new Date(today - n*86400000));
+document.getElementById('date-key').textContent       = fmtFull(dates[0]);
+document.getElementById('date-teapot').textContent    = fmtFull(dates[1]);
+document.getElementById('date-croissant').textContent = fmtFull(dates[2]);
+document.getElementById('date-duck').textContent      = fmtFull(dates[3]);
+
+/* ── Camera state ────────────────────────────────────────────── */
+let stream = null;
+
+/* Open camera overlay, request rear lens */
+async function openCamera() {
+  const overlay = document.getElementById('camera-overlay');
+  const video   = document.getElementById('camera-video');
+  const denied  = document.getElementById('cam-denied');
+
+  overlay.classList.add('active');
+  document.getElementById('fab').style.display = 'none';
+
+  denied.classList.remove('visible');
+  video.style.display = 'block';
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: 'environment' },  /* rear camera */
+        width:  { ideal: 1920 },
+        height: { ideal: 1920 },
+      },
+      audio: false,
+    });
+    video.srcObject = stream;
+  } catch (err) {
+    console.warn('[camera]', err.name, err.message);
+    video.style.display = 'none';
+    denied.classList.add('visible');
   }
-  function fmtFull(d) {
-    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-  }
+}
 
-  const today = new Date();
+/* Stop stream and close overlay */
+function closeCamera() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  document.getElementById('camera-video').srcObject = null;
+  document.getElementById('camera-overlay').classList.remove('active');
+  document.getElementById('fab').style.display = 'flex';
+}
 
-  document.getElementById('header-date').textContent  = fmtShort(today);
-  document.getElementById('header-count').textContent = '4 objects collected';
+/* Capture current video frame → JPEG dataURL */
+function captureFrame() {
+  const video  = document.getElementById('camera-video');
+  const canvas = document.getElementById('capture-canvas');
 
-  // Sample dates — spaced back from today
-  const dates = [
-    new Date(today - 3 * 86400000),
-    new Date(today - 5 * 86400000),
-    new Date(today - 8 * 86400000),
-    new Date(today - 11 * 86400000),
-  ];
+  // Square-crop from the centre of the frame
+  const vw = video.videoWidth  || 1280;
+  const vh = video.videoHeight || 1280;
+  const side = Math.min(vw, vh);
+  const sx = (vw - side) / 2;
+  const sy = (vh - side) / 2;
 
-  document.getElementById('date-key').textContent       = fmtFull(dates[0]);
-  document.getElementById('date-teapot').textContent    = fmtFull(dates[1]);
-  document.getElementById('date-croissant').textContent = fmtFull(dates[2]);
-  document.getElementById('date-duck').textContent      = fmtFull(dates[3]);
+  canvas.width  = 1024;
+  canvas.height = 1024;
+  canvas
+    .getContext('2d')
+    .drawImage(video, sx, sy, side, side, 0, 0, 1024, 1024);
+
+  return canvas.toDataURL('image/jpeg', 0.92);
+}
+
+/* ── Step 1 complete: photo captured ─────────────────────────── */
+function onPhotoCaptured(dataURL) {
+  closeCamera();
+  // dataURL is the raw JPEG — Step 2 (bg removal) will receive it
+  console.log('[step1] photo captured, size:', Math.round(dataURL.length / 1024), 'KB');
+  // TODO: hand off to Step 2
+  alert('📸 Photo captured! Step 2 (background removal) coming next.');
+}
+
+/* ── Event listeners ─────────────────────────────────────────── */
+document.getElementById('fab').addEventListener('click', openCamera);
+document.getElementById('camera-close').addEventListener('click', closeCamera);
+document.getElementById('shutter-btn').addEventListener('click', () => {
+  if (!stream) return;
+  const dataURL = captureFrame();
+  onPhotoCaptured(dataURL);
+});
+
+/* Escape key closes camera */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCamera();
+});
 </script>
 </body>
 </html>
