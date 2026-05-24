@@ -8,99 +8,58 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>Memories</title>
   <style>
-    /* ── Design Tokens — Layer 1 ────────────────────────────────── */
-    /*
-     * Source: CapWords visual reference (screenshot analysis)
-     * Background is warm light grey #edecea — NOT white, NOT cream
-     * Dots are baked into the bg (no separate opacity layer)
-     * Object names: weight 800 (heavy/chunky, like CapWords)
-     * Accent: warm orange #f5a742 (active tab, FAB, confirm btn)
-     */
+    /* ── Layer 1: Design Tokens ──────────────────────────────────── */
     :root {
-      /* ── Backgrounds ── */
-      --color-bg:          #edecea;   /* warm light grey — the actual CapWords bg */
-      --color-surface:     #e6e3e0;   /* slightly darker surface (cards, inputs) */
-      --color-dot:         #ccc8c2;   /* dots baked in, no opacity hack needed */
+      --color-bg:             #edecea;
+      --color-dot:            #ccc8c2;
+      --color-text-primary:   #111111;
+      --color-text-secondary: #888888;
+      --color-text-tertiary:  #bbbbbb;
+      --color-accent:         #f5a742;
+      --color-accent-glow:    rgba(245,167,66,0.30);
 
-      /* ── Text ── */
-      --color-text-primary:    #111111;  /* near-black, slightly deeper than #1a1a1a */
-      --color-text-secondary:  #888888;  /* dates, subtitles */
-      --color-text-tertiary:   #bbbbbb;  /* placeholder, dimmed */
+      --font:     -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --fs-xs:    11px;
+      --fs-sm:    13px;
+      --fs-base:  14px;
+      --fs-md:    15px;
+      --fs-xl:    28px;
+      --fw-reg:   400;
+      --fw-semi:  600;
+      --fw-bold:  800;
 
-      /* ── Accent (warm orange) ── */
-      --color-accent:          #f5a742;
-      --color-accent-dark:     #e8962e;  /* pressed state */
-      --color-accent-glow:     rgba(245,167,66,0.30);
+      --sp-sm:   8px;
+      --sp-md:   12px;
+      --sp-lg:   16px;
+      --sp-xl:   20px;
+      --sp-2xl:  24px;
+      --sp-3xl:  32px;
 
-      /* ── Neutrals ── */
-      --color-btn-neutral:     #e8e5e1;  /* replay/reject button bg */
-      --color-input-bg:        #e6e3e0;  /* name input on grey bg */
-      --color-camera-bg:       #1a1a1a;
+      --r-md:    20px;
+      --r-full:  50%;
 
-      /* ── Typography ── */
-      --font:    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --fs-xs:   11px;
-      --fs-sm:   13px;
-      --fs-base: 14px;
-      --fs-md:   15px;
-      --fs-lg:   22px;
-      --fs-xl:   28px;
-      --fw-reg:  400;
-      --fw-med:  500;
-      --fw-semi: 600;
-      --fw-bold: 800;   /* ← object names — matches CapWords chunky weight */
+      --sh-object: drop-shadow(0 6px 18px rgba(0,0,0,0.14));
+      --sh-fab:    0 6px 20px rgba(245,167,66,0.35);
 
-      /* ── Spacing ── */
-      --sp-xs:  4px;
-      --sp-sm:  8px;
-      --sp-md:  12px;
-      --sp-lg:  16px;
-      --sp-xl:  20px;
-      --sp-2xl: 24px;
-      --sp-3xl: 32px;
-      --sp-4xl: 48px;
-
-      /* ── Radii ── */
-      --r-sm:   12px;
-      --r-md:   20px;
-      --r-full: 50%;
-
-      /* ── Shadows ── */
-      /* On grey bg, shadows need slightly more presence */
-      --sh-object:  drop-shadow(0 6px 18px rgba(0,0,0,0.14));
-      --sh-btn:     0 4px 14px rgba(0,0,0,0.10);
-      --sh-fab:     0 6px 20px rgba(245,167,66,0.35);
-      --sh-close:   0 1px 6px rgba(0,0,0,0.12);
-
-      /* ── Transitions ── */
-      --tx-fast: 0.15s ease;
       --tx-base: 0.2s ease;
-      --tx-slow: 0.3s ease;
     }
 
     /* ── Reset ───────────────────────────────────────────────────── */
     *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0; padding: 0;
+      box-sizing: border-box; margin: 0; padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
-
     html, body { height: 100%; }
 
+    /* ── Base ────────────────────────────────────────────────────── */
     body {
       font-family: var(--font);
-      background-color: var(--color-bg);   /* solid warm grey — no gradient */
+      background-color: var(--color-bg);
       color: var(--color-text-primary);
       overflow: hidden;
     }
 
-    /* ── Dotted texture — baked in, no opacity layer ──────────────── */
-    /*
-     * Dots are the same warm-grey family as the bg.
-     * Color baked in (#ccc8c2) rather than using opacity,
-     * so they show correctly on the grey background.
-     * 1px dot at 28px spacing matches the CapWords density.
-     */
+    /* ── Dot texture ─────────────────────────────────────────────── */
     #dots {
       position: fixed; inset: 0; z-index: 0;
       background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
@@ -109,592 +68,197 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       GRID VIEW
+       HOME / GRID
     ═══════════════════════════════════════════════════════════════ */
-    #grid-view {
+    #home {
       position: fixed; inset: 0; z-index: 1;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       padding:
-        calc(var(--sp-xl) + env(safe-area-inset-top, 0px))
-        calc(var(--sp-md) + env(safe-area-inset-right, 0px))
-        calc(100px + env(safe-area-inset-bottom, 0px))
-        calc(var(--sp-md) + env(safe-area-inset-left, 0px));
+        calc(var(--sp-2xl) + env(safe-area-inset-top,    0px))
+        calc(var(--sp-lg)  + env(safe-area-inset-right,  0px))
+        calc(90px          + env(safe-area-inset-bottom, 0px))
+        calc(var(--sp-lg)  + env(safe-area-inset-left,   0px));
     }
 
+    /* ── Header ──────────────────────────────────────────────────── */
     .header {
-      margin-bottom: var(--sp-2xl);
+      margin-bottom: var(--sp-3xl);
     }
-    .header h1 {
+    .header__date {
+      font-size: var(--fs-sm);
+      font-weight: var(--fw-reg);
+      color: var(--color-text-secondary);
+      margin-bottom: 4px;
+    }
+    .header__title {
       font-size: var(--fs-xl);
       font-weight: var(--fw-reg);
       letter-spacing: -0.5px;
-      line-height: 1.2;
       color: var(--color-text-primary);
+      line-height: 1.15;
     }
-    .header p {
+    .header__count {
       font-size: var(--fs-sm);
-      font-weight: var(--fw-med);
-      letter-spacing: 0.5px;
       color: var(--color-text-secondary);
       margin-top: 4px;
     }
 
-    /* ── Grid ─────────────────────────────────────────────────────── */
+    /* ── Grid ────────────────────────────────────────────────────── */
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: var(--sp-lg);
+      column-gap: var(--sp-lg);
+      row-gap: var(--sp-3xl);   /* generous vertical gap — breathing room */
     }
 
-    /* ── Memory Card ──────────────────────────────────────────────── */
+    /* ── Memory Card ─────────────────────────────────────────────── */
+    /*
+     * NO card container. Objects float directly on the grey bg.
+     * mix-blend-mode: multiply makes white photo backgrounds
+     * disappear against the grey — same trick as CapWords.
+     */
     .card {
       cursor: pointer;
       user-select: none;
       transition: transform var(--tx-base);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .card:active { transform: scale(0.98); }
+    .card:active { transform: scale(0.97); }
 
     .card__img-wrap {
+      width: 100%;
       aspect-ratio: 1;
-      border-radius: var(--r-md);
-      background: var(--color-glass);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
     }
     .card__img-wrap img {
-      width: 85%; height: 85%;
+      width: 90%;
+      height: 90%;
       object-fit: contain;
-      filter: drop-shadow(var(--sh-md));
+      filter: var(--sh-object);
+      mix-blend-mode: multiply;   /* white bg → transparent on grey */
     }
+
     .card__name {
-      font-size: var(--fs-base);
-      font-weight: var(--fw-med);
-      letter-spacing: -0.3px;
+      font-size: var(--fs-md);
+      font-weight: var(--fw-bold);    /* 800 — chunky like CapWords */
+      letter-spacing: -0.2px;
       color: var(--color-text-primary);
       text-align: center;
       margin-top: var(--sp-sm);
+      line-height: 1.2;
     }
     .card__date {
       font-size: var(--fs-xs);
+      font-weight: var(--fw-reg);
       color: var(--color-text-tertiary);
       text-align: center;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
-    /* ── Empty state ──────────────────────────────────────────────── */
-    .empty {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 72px 0 32px;
-    }
-    .empty__icon {
-      font-size: 52px;
-      display: block;
-      margin-bottom: var(--sp-md);
-      opacity: .5;
-    }
-    .empty__label {
-      font-size: var(--fs-sm);
-      color: var(--color-text-secondary);
-      line-height: 1.7;
-    }
-
-    /* ── FAB ──────────────────────────────────────────────────────── */
+    /* ── FAB ─────────────────────────────────────────────────────── */
     #fab {
       position: fixed;
-      bottom: calc(var(--sp-xl) + env(safe-area-inset-bottom, 0px));
-      right:  calc(var(--sp-xl) + env(safe-area-inset-right, 0px));
-      width: 60px; height: 60px;
+      bottom: calc(var(--sp-2xl) + env(safe-area-inset-bottom, 0px));
+      right:  calc(var(--sp-xl)  + env(safe-area-inset-right,  0px));
+      width: 58px; height: 58px;
       border-radius: var(--r-full);
-      background: linear-gradient(135deg, var(--color-accent-warm) 0%, var(--color-accent-warm-dk) 100%);
-      box-shadow: var(--sh-lg);
+      background: var(--color-accent);
+      box-shadow: var(--sh-fab);
       border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 28px; font-weight: var(--fw-semi); color: #fff;
+      font-size: 26px; font-weight: var(--fw-semi); color: #fff;
       z-index: 50;
-      transition: transform var(--tx-fast), box-shadow var(--tx-fast);
+      transition: transform var(--tx-base);
       user-select: none;
     }
-    #fab:active {
-      transform: scale(0.95);
-      box-shadow: 0 4px 12px rgba(232,180,168,0.3);
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       OVERLAY BASE  (shared by Capture + Detail)
-    ═══════════════════════════════════════════════════════════════ */
-    .overlay {
-      position: fixed; inset: 0; z-index: 100;
-      background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-dark) 100%);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: var(--sp-md);
-      padding-top: calc(var(--sp-md) + env(safe-area-inset-top, 0px));
-      padding-bottom: calc(var(--sp-md) + env(safe-area-inset-bottom, 0px));
-    }
-    .overlay.active { display: flex; }
-
-    /* dotted texture on overlays */
-    .overlay::before {
-      content: '';
-      position: fixed; inset: 0; z-index: -1;
-      background-image: radial-gradient(circle, #d9cfc5 0.5px, transparent 0.5px);
-      background-size: 24px 24px;
-      opacity: .12;
-      pointer-events: none;
-    }
-
-    /* ── Close button ─────────────────────────────────────────────── */
-    .close-btn {
-      position: absolute;
-      top:  calc(var(--sp-md) + env(safe-area-inset-top, 0px));
-      left: calc(var(--sp-md) + env(safe-area-inset-left, 0px));
-      width: 40px; height: 40px;
-      border-radius: var(--r-full);
-      background: rgba(255,255,255,0.9);
-      box-shadow: var(--sh-sm);
-      border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; color: var(--color-text-primary);
-      z-index: 101;
-      user-select: none;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       CAPTURE VIEW
-    ═══════════════════════════════════════════════════════════════ */
-    #capture-view {
-      gap: 0;
-    }
-
-    .camera-wrap {
-      width: 100%; max-width: 400px;
-      aspect-ratio: 1;
-      border-radius: var(--r-md);
-      background: var(--color-camera-bg);
-      overflow: hidden;
-      margin-bottom: var(--sp-xl);
-      flex-shrink: 0;
-    }
-    #camera-feed {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* Camera denied state */
-    .camera-denied {
-      display: none;
-      width: 100%; max-width: 400px;
-      aspect-ratio: 1;
-      border-radius: var(--r-md);
-      background: var(--color-camera-bg);
-      flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: var(--sp-sm);
-      margin-bottom: var(--sp-xl);
-      color: var(--color-text-secondary);
-      font-size: var(--fs-sm);
-      text-align: center;
-      padding: var(--sp-xl);
-    }
-    .camera-denied.visible { display: flex; }
-    .camera-denied span:first-child { font-size: 40px; }
-
-    #name-input {
-      width: 100%; max-width: 400px;
-      padding: var(--sp-sm) var(--sp-md);
-      border: none;
-      border-radius: var(--r-md);
-      background: rgba(255,255,255,0.9);
-      font-family: var(--font);
-      font-size: var(--fs-base);
-      text-align: center;
-      color: var(--color-text-primary);
-      box-shadow: var(--sh-subtle);
-      outline: none;
-      margin-bottom: var(--sp-xl);
-      transition: background var(--tx-fast);
-      flex-shrink: 0;
-    }
-    #name-input::placeholder { color: #ccc; }
-    #name-input:focus { background: #fff; }
-
-    #capture-btn {
-      width: 64px; height: 64px;
-      border-radius: var(--r-full);
-      background: linear-gradient(135deg, var(--color-accent-warm) 0%, var(--color-accent-warm-dk) 100%);
-      box-shadow: var(--sh-lg);
-      border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px; color: #fff; font-weight: var(--fw-semi);
-      transition: transform var(--tx-fast);
-      flex-shrink: 0;
-      user-select: none;
-    }
-    #capture-btn:active:not(:disabled) { transform: scale(0.95); }
-    #capture-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .hint {
-      position: absolute;
-      bottom: calc(48px + env(safe-area-inset-bottom, 0px));
-      font-size: var(--fs-sm);
-      color: var(--color-text-secondary);
-      text-align: center;
-      line-height: 1.5;
-      pointer-events: none;
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       DETAIL VIEW
-    ═══════════════════════════════════════════════════════════════ */
-    .detail-img-wrap {
-      width: 100%; max-width: 400px;
-      aspect-ratio: 1;
-      border-radius: var(--r-md);
-      background: var(--color-glass);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: var(--sp-3xl);
-      flex-shrink: 0;
-    }
-    .detail-img-wrap img {
-      width: 90%; height: 90%;
-      object-fit: contain;
-      filter: drop-shadow(var(--sh-md));
-    }
-
-    #detail-name {
-      font-size: var(--fs-lg);
-      font-weight: var(--fw-reg);
-      letter-spacing: -0.5px;
-      color: var(--color-text-primary);
-      text-align: center;
-      margin-bottom: 8px;
-    }
-    #detail-date {
-      font-size: var(--fs-base);
-      color: var(--color-text-secondary);
-      text-align: center;
-    }
+    #fab:active { transform: scale(0.95); }
   </style>
 </head>
 <body>
 
-<!-- Dotted background -->
 <div id="dots" aria-hidden="true"></div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     GRID VIEW
+     HOME SCREEN
 ═══════════════════════════════════════════════════════════════ -->
-<main id="grid-view">
+<main id="home">
+
   <header class="header">
-    <h1>Memories</h1>
-    <p id="count">— objects collected</p>
+    <p class="header__date" id="header-date"></p>
+    <h1 class="header__title">Memories</h1>
+    <p class="header__count" id="header-count"></p>
   </header>
-  <section class="grid" id="grid" aria-label="Memory collection"></section>
+
+  <section class="grid" id="grid" aria-label="Memory collection">
+
+    <div class="card" role="button" tabindex="0" aria-label="Vintage Key">
+      <div class="card__img-wrap">
+        <img src="assets/key.webp" alt="Vintage Key" loading="eager" decoding="async" />
+      </div>
+      <p class="card__name">Vintage Key</p>
+      <p class="card__date" id="date-key"></p>
+    </div>
+
+    <div class="card" role="button" tabindex="0" aria-label="Blue Teapot">
+      <div class="card__img-wrap">
+        <img src="assets/teapot.webp" alt="Blue Teapot" loading="eager" decoding="async" />
+      </div>
+      <p class="card__name">Blue Teapot</p>
+      <p class="card__date" id="date-teapot"></p>
+    </div>
+
+    <div class="card" role="button" tabindex="0" aria-label="Croissant">
+      <div class="card__img-wrap">
+        <img src="assets/croissant.png" alt="Croissant" loading="eager" decoding="async" />
+      </div>
+      <p class="card__name">Croissant</p>
+      <p class="card__date" id="date-croissant"></p>
+    </div>
+
+    <div class="card" role="button" tabindex="0" aria-label="Rubber Duck">
+      <div class="card__img-wrap">
+        <img src="assets/duck.webp" alt="Rubber Duck" loading="eager" decoding="async" />
+      </div>
+      <p class="card__name">Rubber Duck</p>
+      <p class="card__date" id="date-duck"></p>
+    </div>
+
+  </section>
 </main>
 
-<!-- FAB -->
 <button id="fab" aria-label="Add new memory">+</button>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     CAPTURE VIEW
-═══════════════════════════════════════════════════════════════ -->
-<div id="capture-view" class="overlay" role="dialog" aria-modal="true" aria-label="Capture new object">
-  <button class="close-btn" id="close-capture" aria-label="Close">✕</button>
-
-  <div class="camera-wrap" id="camera-wrap">
-    <video id="camera-feed" autoplay playsinline muted></video>
-  </div>
-  <div class="camera-denied" id="camera-denied" aria-live="polite">
-    <span>📷</span>
-    <span>Camera access denied.<br>Please allow camera in your browser settings.</span>
-  </div>
-
-  <input
-    id="name-input"
-    type="text"
-    placeholder="Name this object..."
-    maxlength="50"
-    autocomplete="off"
-    autocorrect="off"
-    autocapitalize="words"
-    spellcheck="false"
-  />
-
-  <button id="capture-btn" aria-label="Capture photo">✓</button>
-
-  <p class="hint" aria-hidden="true">Point at an object and tap ✓ to capture</p>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════
-     DETAIL VIEW
-═══════════════════════════════════════════════════════════════ -->
-<div id="detail-view" class="overlay" role="dialog" aria-modal="true" aria-label="Object detail">
-  <button class="close-btn" id="close-detail" aria-label="Close">✕</button>
-
-  <div class="detail-img-wrap">
-    <img id="detail-image" src="" alt="" />
-  </div>
-  <h2 id="detail-name"></h2>
-  <p  id="detail-date"></p>
-</div>
-
-<!-- Off-screen canvas for JPEG capture -->
-<canvas id="canvas" style="display:none"></canvas>
-
 <script>
-'use strict';
-
-/* ── Helpers ───────────────────────────────────────────────────── */
-function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function fmtDate(ts) {
-  return new Date(ts).toLocaleDateString('en-US', {
-    month: 'long', day: 'numeric', year: 'numeric'
-  });
-}
-
-function svgURI(content) {
-  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(content);
-}
-
-function makeSampleSVG(emoji) {
-  return svgURI(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">` +
-    `<text x="100" y="145" font-size="130" text-anchor="middle" ` +
-    `dominant-baseline="auto" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">${emoji}</text>` +
-    `</svg>`
-  );
-}
-
-/* ── Sample data (seeded on first visit) ───────────────────────── */
-const SAMPLES = [
-  { id: 1716403200001, name: 'Vintage Key',  date: 'May 23, 2026', image: makeSampleSVG('🗝️') },
-  { id: 1716403200002, name: 'Blue Teapot',  date: 'May 22, 2026', image: makeSampleSVG('🫖') },
-  { id: 1716403200003, name: 'Croissant',    date: 'May 21, 2026', image: makeSampleSVG('🥐') },
-  { id: 1716403200004, name: 'Rubber Duck',  date: 'May 20, 2026', image: makeSampleSVG('🦆') },
-];
-
-/* ── Storage ───────────────────────────────────────────────────── */
-const KEY = 'memories_collection';
-
-function load() {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (raw === null) return null;   // null = first visit
-    return JSON.parse(raw);
-  } catch { return []; }
-}
-
-function save(arr) {
-  try { localStorage.setItem(KEY, JSON.stringify(arr)); }
-  catch (e) { console.warn('[memories] localStorage full:', e); }
-}
-
-function getAll() {
-  let m = load();
-  if (m === null) { m = SAMPLES; save(m); }
-  return m;
-}
-
-function addMemory(obj) {
-  const arr = getAll();
-  arr.push(obj);
-  save(arr);
-}
-
-/* ── Render grid ───────────────────────────────────────────────── */
-function renderGrid() {
-  const all    = getAll();
-  const sorted = [...all].sort((a, b) => b.id - a.id);
-  const n      = sorted.length;
-
-  document.getElementById('count').textContent =
-    `${n} ${n === 1 ? 'object' : 'objects'} collected`;
-
-  const grid = document.getElementById('grid');
-
-  if (n === 0) {
-    grid.innerHTML =
-      `<div class="empty">` +
-        `<span class="empty__icon">✦</span>` +
-        `<p class="empty__label">No memories yet.<br>Tap + to capture your first object.</p>` +
-      `</div>`;
-    return;
+  // ── Date helpers ────────────────────────────────────────────────
+  function fmtShort(d) {
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  }
+  function fmtFull(d) {
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   }
 
-  grid.innerHTML = sorted.map(m =>
-    `<div class="card" data-id="${m.id}" role="button" tabindex="0" aria-label="${esc(m.name)}">` +
-      `<div class="card__img-wrap">` +
-        `<img src="${m.image}" alt="${esc(m.name)}" loading="lazy" decoding="async" />` +
-      `</div>` +
-      `<p class="card__name">${esc(m.name)}</p>` +
-      `<p class="card__date">${m.date}</p>` +
-    `</div>`
-  ).join('');
+  const today = new Date();
 
-  grid.querySelectorAll('.card').forEach(el => {
-    el.addEventListener('click', () => openDetail(+el.dataset.id));
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') openDetail(+el.dataset.id);
-    });
-  });
-}
+  document.getElementById('header-date').textContent  = fmtShort(today);
+  document.getElementById('header-count').textContent = '4 objects collected';
 
-/* ── Detail view ───────────────────────────────────────────────── */
-function openDetail(id) {
-  const m = getAll().find(x => x.id === id);
-  if (!m) return;
-  document.getElementById('detail-image').src  = m.image;
-  document.getElementById('detail-image').alt  = m.name;
-  document.getElementById('detail-name').textContent = m.name;
-  document.getElementById('detail-date').textContent = m.date;
-  showOverlay('detail-view');
-}
+  // Sample dates — spaced back from today
+  const dates = [
+    new Date(today - 3 * 86400000),
+    new Date(today - 5 * 86400000),
+    new Date(today - 8 * 86400000),
+    new Date(today - 11 * 86400000),
+  ];
 
-function closeDetail() { hideOverlay('detail-view'); }
-
-/* ── Capture view ──────────────────────────────────────────────── */
-let mediaStream = null;
-
-async function openCapture() {
-  document.getElementById('name-input').value = '';
-  const btn = document.getElementById('capture-btn');
-  btn.disabled  = false;
-  btn.textContent = '✓';
-
-  document.getElementById('camera-wrap').style.display   = 'block';
-  document.getElementById('camera-denied').classList.remove('visible');
-
-  showOverlay('capture-view');
-
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'environment' },
-        width:  { ideal: 1280 },
-        height: { ideal: 1280 },
-      }
-    });
-    document.getElementById('camera-feed').srcObject = mediaStream;
-  } catch (err) {
-    console.warn('[memories] camera:', err.name, err.message);
-    document.getElementById('camera-wrap').style.display = 'none';
-    document.getElementById('camera-denied').classList.add('visible');
-  }
-}
-
-function closeCapture() {
-  stopStream();
-  hideOverlay('capture-view');
-}
-
-function stopStream() {
-  if (mediaStream) {
-    mediaStream.getTracks().forEach(t => t.stop());
-    mediaStream = null;
-  }
-  const vid = document.getElementById('camera-feed');
-  vid.srcObject = null;
-}
-
-/* ── Auto-names when field is blank ────────────────────────────── */
-const NOUNS = [
-  'Found Object', 'Curious Thing', 'Little Treasure',
-  'Mystery Item', 'Daily Artifact', 'Beloved Object',
-  'Something Special', 'Collected Piece', 'Quiet Relic',
-];
-function autoName() {
-  return NOUNS[Math.floor(Math.random() * NOUNS.length)];
-}
-
-/* ── Capture photo ─────────────────────────────────────────────── */
-async function capturePhoto() {
-  if (!mediaStream) return;              // camera not ready / denied
-
-  const btn = document.getElementById('capture-btn');
-  btn.disabled    = true;
-  btn.textContent = '…';
-
-  try {
-    const video  = document.getElementById('camera-feed');
-    const canvas = document.getElementById('canvas');
-    const SIZE   = 900;                  // square output px
-
-    canvas.width  = SIZE;
-    canvas.height = SIZE;
-    const ctx = canvas.getContext('2d');
-
-    // Centre-crop: take the largest square from the video centre
-    const vw   = video.videoWidth  || video.clientWidth;
-    const vh   = video.videoHeight || video.clientHeight;
-    const side = Math.min(vw, vh);
-    const sx   = (vw - side) / 2;
-    const sy   = (vh - side) / 2;
-    ctx.drawImage(video, sx, sy, side, side, 0, 0, SIZE, SIZE);
-
-    const dataURL = canvas.toDataURL('image/jpeg', 0.88);
-
-    const rawName = document.getElementById('name-input').value.trim();
-    const name    = rawName || autoName();
-    const id      = Date.now();
-
-    addMemory({ id, name, date: fmtDate(id), image: dataURL });
-
-    closeCapture();
-    renderGrid();
-  } catch (err) {
-    console.error('[memories] capture failed:', err);
-    btn.disabled    = false;
-    btn.textContent = '✓';
-  }
-}
-
-/* ── Overlay helpers (show/hide FAB together) ──────────────────── */
-function showOverlay(id) {
-  document.getElementById(id).classList.add('active');
-  document.getElementById('fab').style.display = 'none';
-}
-
-function hideOverlay(id) {
-  document.getElementById(id).classList.remove('active');
-  document.getElementById('fab').style.display = 'flex';
-}
-
-/* ── Event wiring ──────────────────────────────────────────────── */
-document.getElementById('fab').addEventListener('click', openCapture);
-
-document.getElementById('close-capture').addEventListener('click', closeCapture);
-document.getElementById('close-detail').addEventListener('click',  closeDetail);
-
-document.getElementById('capture-btn').addEventListener('click', capturePhoto);
-
-document.getElementById('name-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') capturePhoto();
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key !== 'Escape') return;
-  if (document.getElementById('capture-view').classList.contains('active')) closeCapture();
-  if (document.getElementById('detail-view').classList.contains('active'))  closeDetail();
-});
-
-/* ── Boot ──────────────────────────────────────────────────────── */
-renderGrid();
+  document.getElementById('date-key').textContent       = fmtFull(dates[0]);
+  document.getElementById('date-teapot').textContent    = fmtFull(dates[1]);
+  document.getElementById('date-croissant').textContent = fmtFull(dates[2]);
+  document.getElementById('date-duck').textContent      = fmtFull(dates[3]);
 </script>
 </body>
 </html>
