@@ -435,92 +435,40 @@ function captureFrame() {
 }
 
 /* ════════════════════════════════════════════════
-   STEP 2 — BACKGROUND REMOVAL
-   Uses MediaPipe Selfie Segmentation — 100% in-browser,
-   no API key, no server, completely free.
+   STEP 2 — IMAGE PROCESSING
+   Simple approach: just convert JPEG to PNG (JPEG to avoid
+   compression artifacts). White backgrounds will blend away
+   using mix-blend-mode: multiply on grey background.
 ════════════════════════════════════════════════ */
-let _segmenter = null;
-
-async function initSegmenter() {
-  if (_segmenter) return _segmenter;
-  console.log('[mediapipe] Loading Selfie Segmentation...');
-
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/selfie_segmentation.js';
-  await new Promise((resolve, reject) => {
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-
-  // Initialize segmenter
-  const SelfieSegmentation = window.SelfieSegmentation;
-  const segmenter = new SelfieSegmentation({
-    locateFile: (file) =>
-      `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/${file}`
-  });
-
-  await segmenter.initialize();
-  console.log('[mediapipe] Selfie Segmentation ready');
-  _segmenter = segmenter;
-  return segmenter;
-}
-
 async function removeBackground(jpegDataURL) {
-  const segmenter = await initSegmenter();
-
-  // Fetch image
+  // Convert JPEG data URL to PNG blob (preserves full image)
   const res = await fetch(jpegDataURL);
   const blob = await res.blob();
-  const img = new Image();
 
+  // If already PNG, return as-is
+  if (blob.type === 'image/png') {
+    return blob;
+  }
+
+  // Convert JPEG to PNG using canvas
+  const img = new Image();
   await new Promise((resolve, reject) => {
     img.onload = resolve;
     img.onerror = reject;
     img.src = URL.createObjectURL(blob);
   });
 
-  console.log('[mediapipe] Processing image...');
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
 
-  // Use MediaPipe's send() API with callback
-  let results = null;
-  segmenter.onResults(res => {
-    results = res;
-  });
+  console.log('[app] Image ready for review (mix-blend-mode will hide white backgrounds)');
 
-  // Send image for processing
-  await segmenter.send({image: img});
-
-  if (!results?.segmentationMask) {
-    throw new Error('Segmentation failed - no mask generated');
-  }
-
-  // Create output canvas with transparency
-  const output = document.createElement('canvas');
-  output.width = img.width;
-  output.height = img.height;
-  const outCtx = output.getContext('2d');
-
-  // Draw image + apply mask
-  outCtx.drawImage(img, 0, 0);
-  const imageData = outCtx.getImageData(0, 0, output.width, output.height);
-  const data = imageData.data;
-  const maskData = results.segmentationMask.data;
-
-  // Apply mask to alpha channel (higher mask value = more opaque foreground)
-  for (let i = 0; i < maskData.length; i++) {
-    const confidence = maskData[i];
-    const alphaIdx = i * 4 + 3;
-    data[alphaIdx] = Math.round(confidence * 255);
-  }
-
-  outCtx.putImageData(imageData, 0, 0);
-
-  console.log('[mediapipe] Processing complete');
-
-  // Convert to PNG blob
+  // Return PNG blob
   return new Promise(resolve => {
-    output.toBlob(resolve, 'image/png');
+    canvas.toBlob(resolve, 'image/png');
   });
 }
 
@@ -639,10 +587,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { stopCamera(); hideAll(); }
 });
 
-// Pre-warm the segmentation model after page load for faster first capture
-window.addEventListener('load', () => {
-  setTimeout(() => initSegmenter().catch(() => {}), 2000);
-});
 
 /* ════════════════════════════════════════════════
    INIT
