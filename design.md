@@ -1,10 +1,13 @@
-# Memory App - Design System
+# Memory App — Design System
+**Source of truth. Based on CapWords visual reference (May 2026).**
+
+---
 
 ## Design Philosophy
 
 **Core Principle:** Interface disappears. Objects shine.
 
-The design is inspired by CapWords—minimal UI, maximum visual focus on content. Objects float freely on soft, neutral backgrounds with subtle visual hierarchy. Everything supports the primary experience: discovering and remembering objects.
+Directly inspired by CapWords. The background is pure white — nothing competes with the object. Cards have no visible container in the grid; images simply float with a soft drop shadow. Color lives in categories and accents, not the background. Typography is confident (heavy names, quiet metadata).
 
 ---
 
@@ -12,432 +15,534 @@ The design is inspired by CapWords—minimal UI, maximum visual focus on content
 
 ### 1.1 Aesthetic Direction
 
-**Style:** Clean, modern minimalism with a touch of playfulness
+- **Background:** Pure white. Not cream, not grey — `#ffffff`.
+- **Objects:** Float directly on white. No card border, no glassmorphism in the grid.
+- **Typography:** Bold object names (weight 700). Quiet metadata. Clear hierarchy.
+- **Accent:** Warm orange (matches CapWords Capture tab + confirm button).
+- **Category tiles:** Muted pastel blocks — each category has its own identity color.
+- **Glow:** Object images get a warm radial glow on the review/detail screen.
 
-- No dark mode initially
-- Light, airy, breathing space
-- Objects are stickers—clean, floating, with soft shadows
-- Typography is quiet (light weight, generous spacing)
-- Color is restrained (cream/grey/neutral with warm accents)
+**What was removed from the old spec:**
+- ❌ Cream/linen background gradient
+- ❌ Dotted background texture
+- ❌ Glassmorphism card containers in the grid
+- ❌ Peachy button gradient (#e8b4a8 → #d9a896)
 
-**Reference Apps:**
-- CapWords (object photography + language learning)
-- Curated Supply (minimal object grid)
-- MyStash (inventory focus, zero UI)
-- Day One (journaling, soft aesthetic)
-
-**Inspiration Board:**
-- Soft dotted paper textures
-- Vintage postcards
-- Japanese wabi-sabi (impermanence, simplicity)
-- Cottagecore aesthetic (natural, nostalgic, intimate)
+**What was added from CapWords reference:**
+- ✅ White background
+- ✅ Warm orange accent
+- ✅ Bold object names
+- ✅ Object glow on detail/review screens
+- ✅ Three-button review row (↺ / ✓ / ✕)
+- ✅ Tab bar navigation
+- ✅ Circular progress ring
+- ✅ Category tile cards
 
 ---
 
 ## 2. Color Palette
 
-### 2.1 Primary Colors
+### 2.1 Base Colors
 
-| Color Name | Hex | RGB | Usage |
-|------------|-----|-----|-------|
-| Cream | #faf8f6 | 250, 248, 246 | Background light |
-| Linen | #f5f2ef | 245, 242, 239 | Background gradient end |
-| Stone | #e8e5e0 | 232, 229, 224 | Borders, light accents |
-| Charcoal | #1a1a1a | 26, 26, 26 | Text, dark elements |
-| Taupe | #999999 | 153, 153, 153 | Secondary text |
-| Dust | #bbbbbb | 187, 187, 187 | Tertiary text, hints |
+| Token | Hex | RGB | Usage |
+|-------|-----|-----|-------|
+| White | `#ffffff` | 255, 255, 255 | **Primary background (all screens)** |
+| Off-white | `#f7f7f7` | 247, 247, 247 | Secondary surfaces, tab bar bg |
+| Text primary | `#1a1a1a` | 26, 26, 26 | Object names, headings |
+| Text secondary | `#999999` | 153, 153, 153 | Dates, subtitles, hints |
+| Text tertiary | `#bbbbbb` | 187, 187, 187 | Placeholder, dimmed labels |
+| Divider | `#eeeeee` | 238, 238, 238 | Hairline separators |
 
-### 2.2 Accent Colors
+### 2.2 Accent — Warm Orange
 
-| Color Name | Hex | RGB | Usage |
-|------------|-----|-----|-------|
-| Warm Beige | #e8b4a8 | 232, 180, 168 | Primary button start |
-| Warm Brown | #d9a896 | 217, 168, 150 | Primary button end |
-| Camera Black | #1a1a1a | 26, 26, 26 | Video background |
+The single primary action color. Used for: active tab, confirm button, FAB.
 
-### 2.3 Semantic Colors
+| Token | Hex | Usage |
+|-------|-----|-------|
+| Orange | `#f5a742` | Active tab icon, confirm (✓) button fill |
+| Orange dark | `#e8962e` | Button pressed state |
+| Orange glow | `rgba(245,167,66,0.15)` | FAB shadow |
 
-| Element | Color | Opacity |
-|---------|-------|---------|
-| Glass container | rgba(255,255,255,0.5) | 50% white |
-| Glass container (dark) | rgba(0,0,0,0.05) | 5% black (subtle) |
-| Dotted background | #d9cfc5 | Muted taupe |
-| Shadow (light) | rgba(0,0,0,0.08) | Very subtle |
-| Shadow (medium) | rgba(0,0,0,0.1) | Subtle |
+### 2.3 Category Tile Colors
 
-### 2.4 Gradients
+Each category has a fixed muted pastel. Used as solid tile backgrounds with white text.
 
-**Background Gradient:**
-```css
-linear-gradient(135deg, #faf8f6 0%, #f5f2ef 100%)
-```
-Subtle diagonal blend from cream to light grey.
+| Category | Hex | RGB | Appearance |
+|----------|-----|-----|------------|
+| Food & Drinks | `#9585bf` | 149, 133, 191 | Dusty purple |
+| People & Family | `#7fa0c0` | 127, 160, 192 | Muted blue |
+| Body & Health | `#9a7aaa` | 154, 122, 170 | Soft plum |
+| Animals & Nature | `#8a9a64` | 138, 154, 100 | Olive green |
+| Home & Furniture | `#b07882` | 176, 120, 130 | Dusty rose |
+| School & Study | `#a89060` | 168, 144, 96 | Warm tan |
 
-**Primary Button Gradient:**
-```css
-linear-gradient(135deg, #e8b4a8 0%, #d9a896 100%)
-```
-Warm beige to warm brown (peachy, inviting).
+### 2.4 Functional Colors
+
+| Element | Color | Notes |
+|---------|-------|-------|
+| Camera background | `#1a1a1a` | Video preview bg |
+| Review glow | `rgba(255, 220, 100, 0.35)` | Warm yellow radial glow behind object |
+| Replay button | `#efefef` | Light grey circle |
+| Reject button (✕) | `#efefef` | Light grey circle |
+| Confirm button (✓) | `#f5a742` | Orange fill, white icon |
+| Tab bar background | `#ffffff` | + top border `#eeeeee` |
 
 ---
 
 ## 3. Typography
 
-### 3.1 Font Families
+### 3.1 Font Family
 
-**Primary:** System fonts (best legibility on mobile)
+System fonts only — loads instantly, feels native.
+
 ```css
 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 ```
 
-**Weights Used:**
-- 400 (regular) — body text, section titles
-- 500 (medium) — emphasis, card titles
-- 600 (semibold) — buttons, badges (rare)
-
-**Why:** System fonts load instantly, feel native on iOS/Android, and are highly legible at all sizes.
-
 ### 3.2 Type Scale
 
-| Usage | Size | Weight | Line Height | Letter Spacing | Notes |
-|-------|------|--------|-------------|-----------------|-------|
-| Page Title | 32px | 400 | 1.2 | -0.5px | "Memories" heading |
-| Subtitle | 13px | 500 | 1.4 | 0.5px | "X objects collected" |
-| Card Title | 14px | 500 | 1.3 | -0.3px | Object names |
-| Card Meta | 11px | 400 | 1.4 | 0 | Dates on cards |
-| Detail Title | 28px | 400 | 1.2 | -0.5px | Full-screen object name |
-| Detail Meta | 14px | 400 | 1.4 | 0 | Full-screen date |
-| Input Label | 14px | 400 | 1.3 | 0 | Camera input field |
-| Hint Text | 13px | 400 | 1.4 | 0 | "Point at object..." |
-| Button Text | 24px | 600 | 1 | 0 | Emoji/symbols (✓, +) |
+| Role | Size | Weight | Letter-spacing | Color | Notes |
+|------|------|--------|----------------|-------|-------|
+| Page greeting | 28px | 400 | -0.3px | `#1a1a1a` | "Good Morning" / "Memories" |
+| Date label | 13px | 400 | 0 | `#999` | "May 19" above greeting |
+| Greeting sub | 15px | 400 | 0 | `#999` | "Awesome! You've snapped 2 words!" |
+| **Grid object name** | **15px** | **700** | **-0.2px** | **`#1a1a1a`** | **Bold — most visible text in grid** |
+| Grid date | 11px | 400 | 0 | `#bbb` | Below object name |
+| Review name | 22px | 700 | -0.3px | `#1a1a1a` | Object name on review screen |
+| Review subtitle | 14px | 400 | 0 | `#999` | Date or secondary label |
+| Category tile name | 17px | 600 | 0 | `#ffffff` | Inside colored tile |
+| Category word count | 12px | 400 | 0 | `rgba(255,255,255,0.8)` | "3 Words" |
+| Tab label | 11px | 400 | 0 | `#999` (inactive) / `#f5a742` (active) | |
+| Input text | 14px | 400 | 0 | `#1a1a1a` | Name input field |
+| Hint text | 13px | 400 | 0 | `#999` | "Not what you expected?" |
 
-### 3.3 Text Colors
+### 3.3 Key Typography Rule
 
-| Element | Color | Hex |
-|---------|-------|-----|
-| Primary text | Charcoal | #1a1a1a |
-| Secondary text | Taupe | #999999 |
-| Tertiary text | Dust | #bbbbbb |
-| Placeholder | Dust | #cccccc |
-| Hint text | Taupe | #999999 |
+> Object names are **bold (700)** — this is the single biggest change from the original spec.
+> The name must be immediately readable at a glance. No medium/500 for primary labels.
 
 ---
 
 ## 4. Layout & Spacing
 
-### 4.1 Grid System
+### 4.1 Spacing Scale (4px base)
 
-**Mobile-First (Base: 375px viewport)**
-- 2-column grid for object cards
-- 1-column for text/inputs
-- Flexible, no hard breakpoints yet
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--sp-xs` | 4px | Micro gaps |
+| `--sp-sm` | 8px | Tight pairs |
+| `--sp-md` | 12px | Component internals |
+| `--sp-lg` | 16px | Page margins |
+| `--sp-xl` | 20px | Grid gaps, section gaps |
+| `--sp-2xl` | 24px | Major section spacing |
+| `--sp-3xl` | 32px | Header bottom margin |
+| `--sp-4xl` | 48px | Large whitespace |
 
-**Spacing Unit:** 4px base
-- Micro: 4px, 8px
-- Small: 12px, 16px
-- Medium: 20px, 24px
-- Large: 32px, 48px
-- Extra: 64px, 100px
+### 4.2 Page Padding
 
-### 4.2 Page Margins & Padding
-
-| View | Padding | Notes |
-|------|---------|-------|
-| Grid (horizontal) | 16px left/right | Safe area on phone |
-| Grid (vertical top) | 24px | Room for status bar |
-| Grid (vertical bottom) | 100px | Space for FAB |
-| Capture view | 16px (all sides) | Centered content |
-| Detail view | 16px (all sides) | Centered content |
+| Screen | Padding | Notes |
+|--------|---------|-------|
+| Grid view | 16px h, 20px top, 80px bottom | 80px bottom = tab bar height |
+| Capture view | 16px all | Camera-focused layout |
+| Review screen | 16px h, 24px top | Centered object + buttons |
+| Detail view | 16px all | Centered object |
 
 ### 4.3 Component Spacing
 
 | Component | Spacing | Notes |
 |-----------|---------|-------|
-| Header to grid | 32px margin-bottom | Clear separation |
-| Grid gap (horizontal) | 20px | Between card columns |
-| Grid gap (vertical) | 20px | Between rows |
-| Image to name | 12px margin-bottom | Visual separation |
-| Name to date | 6px margin-bottom | Tight grouping |
-| Camera to input | 24px margin-bottom | Breathing room |
-| Input to button | 24px margin-bottom | Clear action area |
+| Header to grid | 24px | After greeting block |
+| Grid gap | 16px h × 24px v | Slightly tighter horizontal |
+| Object image to name | 10px | Tight grouping |
+| Name to date | 4px | Very tight, secondary info |
+| Camera to input | 20px | |
+| Input to review buttons | 24px | |
+| Tab bar height | 56px + safe area | Fixed at bottom |
 
 ---
 
 ## 5. Components
 
-### 5.1 Memory Card
+### 5.1 Memory Card (Grid)
 
-**Container:**
-- Size: 1:1 aspect ratio (square)
-- Border radius: 24px (rounded but not pill-shaped)
-- Background: rgba(255,255,255,0.5) with backdrop-filter blur(8px)
-- Border: none (no outlines, floating effect)
-- Padding: none (image takes full space with inner padding)
+Objects float **directly on the white page** — no container box, no border, no glass.
+
+```
+  [  object image  ]   ← no container, just image + shadow
+    Object Name         ← 15px bold, centered
+    May 19, 2026        ← 11px, #bbb, centered
+```
 
 **Image:**
-- Size: 85% of container
-- Object-fit: contain (preserves aspect ratio)
-- Padding: 16px inner (breathing room)
-- Shadow: drop-shadow(0 4px 12px rgba(0,0,0,0.08))
+- Width/height: fills ~85% of grid column width
+- Object-fit: contain
+- Filter: `drop-shadow(0 6px 16px rgba(0,0,0,0.12))`
+- No background box behind image
 
-**Text (name):**
-- Font: 14px, weight 500
-- Color: #1a1a1a
-- Text-align: center
-- Margin-bottom: 6px
+**Name:**
+- 15px, weight **700**, `#1a1a1a`, centered
+- Margin-top: 10px
 
-**Text (date):**
-- Font: 11px, weight 400
-- Color: #bbb
-- Text-align: center
-- Margin-bottom: 0
+**Date:**
+- 11px, weight 400, `#bbb`, centered
+- Margin-top: 4px
 
-**Interaction:**
-- On tap: scale(0.98) (subtle press feedback)
-- Transition: transform 0.3s ease
+**Tap state:**
+- `transform: scale(0.97)`
+- `transition: transform 0.2s ease`
 
-**Visual Style:**
-- Floating: no border, soft shadow makes it feel like it's above the background
-- Minimal: typography is quiet, image dominates
+> **Critical difference from old spec:** No glass/frosted container in the grid.
+> Cards are card-less — it's just an image floating on white.
 
-### 5.2 Floating Action Button (FAB)
+### 5.2 Object Glow (Detail / Review Screen)
+
+Used when an object is displayed full-size (detail view, capture review).
+
+```css
+/* Behind the object image */
+background: radial-gradient(
+  ellipse 70% 60% at 50% 55%,
+  rgba(255, 220, 100, 0.35) 0%,
+  transparent 70%
+);
+```
+
+- Warm yellow radial glow, centered below the object
+- Gives objects a "spotlit" feel on white
+- Does NOT appear in the grid (grid = no bg effect)
+- Contained in the image wrapper div
+
+### 5.3 Three-Button Review Row
+
+Appears on the capture review screen after a photo is taken.
+
+```
+  [↺]   [✓]   [✕]
+```
+
+| Button | Size | Background | Icon | Color |
+|--------|------|-----------|------|-------|
+| Replay (↺) | 52px circle | `#efefef` | ↺ | `#666` |
+| Confirm (✓) | 60px circle | `#f5a742` | ✓ | `#ffffff` |
+| Reject (✕) | 52px circle | `#efefef` | ✕ | `#666` |
+
+- Confirm button is visually dominant (larger, orange)
+- All three are circles (`border-radius: 50%`)
+- Arranged in a row with `gap: 20px`, centered
+- Confirm tap: `scale(0.95)`, `transition: 0.15s ease`
+- Hint text below: `"Not what you expected? Tap to adjust"` — 13px, `#999`
+
+### 5.4 FAB (Floating Action Button)
+
+Now uses warm orange to match the accent system.
 
 **Container:**
-- Position: fixed, bottom 24px, right 24px
-- Size: 60px circle (border-radius: 50%)
-- Background: linear-gradient(135deg, #e8b4a8 0%, #d9a896 100%)
-- Box shadow: 0 8px 24px rgba(232,180,168,0.3)
+- Size: 58px circle
+- Background: `#f5a742`
+- Box shadow: `0 6px 20px rgba(245,167,66,0.35)`
+- Position: fixed, bottom 24px + safe area, right 20px
 - Z-index: 50
 
-**Icon:**
-- Symbol: + (plus sign)
-- Font-size: 28px
-- Color: white (#ffffff)
-- Font-weight: 600
-- Text-align: center (flexbox)
+**Icon:** `+`, 26px, white, weight 600
 
-**Interaction:**
-- On tap: scale(0.95) (press effect)
-- Transition: transform 0.2s ease, box-shadow 0.2s ease
-- Always visible on grid view
+**Tap state:** `scale(0.95)`, `transition: 0.2s ease`
 
-**Style Guide:**
-- Primary action—warm, inviting color
-- Prominent but not intrusive
-- Matches CapWords + button aesthetic
+### 5.5 Tab Bar
 
-### 5.3 Close Button
+Bottom navigation — always visible on home/grid screen.
 
-**Container:**
-- Position: absolute, top 16px, left 16px
-- Size: 40px circle (border-radius: 50%)
-- Background: rgba(255,255,255,0.9)
-- Box shadow: 0 2px 8px rgba(0,0,0,0.1)
-- Z-index: 101 (above other overlays)
-
-**Icon:**
-- Symbol: ✕ (multiplication sign / X)
-- Font-size: 20px
-- Color: #1a1a1a
-- Font-weight: normal
-
-**Interaction:**
-- On tap: none (instant close)
-- No visual feedback (too small for scale effect)
-
-### 5.4 Camera Input Field
-
-**Container:**
-- Width: 100%, max-width 400px
-- Padding: 12px 16px
-- Border: none
-- Border-radius: 24px (pill shape)
-- Background: rgba(255,255,255,0.9)
-- Font: 14px, center-aligned
-- Font-family: inherit
-- Box-shadow: 0 2px 8px rgba(0,0,0,0.05)
-
-**Placeholder:**
-- Color: #ccc
-- Text: "Name this object..."
-
-**Focus State:**
-- Background: rgba(255,255,255,1) (fully opaque)
-- Outline: none (use background change)
-- Box-shadow: same
-
-**Style Guide:**
-- Soft, non-intrusive
-- Feels like part of the interface, not fighting for attention
-
-### 5.5 Capture Button
-
-**Container:**
-- Size: 64px circle (border-radius: 50%)
-- Background: linear-gradient(135deg, #e8b4a8 0%, #d9a896 100%)
-- Border: none
-- Box shadow: 0 8px 24px rgba(232,180,168,0.3)
-
-**Icon:**
-- Symbol: ✓ (checkmark)
-- Font-size: 24px
-- Color: white (#ffffff)
-- Font-weight: 600
-
-**States:**
-- Normal: gradient + shadow
-- Active (on tap): scale(0.95)
-- Disabled: opacity 0.6, cursor not-allowed
-
-**Interaction:**
-- Tap to capture photo from camera
-- Shows loading state (optional: "...")
-
-### 5.6 Glass Container (Images)
-
-**Style:**
-```css
-background: rgba(255,255,255,0.5);
-backdrop-filter: blur(8px);
-border-radius: 24px;
+```
+┌─────────────────────────────────┐
+│  [📷]      [🔖]      [👤]       │
+│ Capture    Vocab    Profile     │
+└─────────────────────────────────┘
 ```
 
-**Why "glass":**
-- Translucent background lets soft gradient show through
-- Blur gives frosted glass effect
-- Objects appear to float above the background
-- Modern, Apple-like aesthetic
+**Container:**
+- Position: fixed, bottom 0, full width
+- Height: 56px + `env(safe-area-inset-bottom)`
+- Background: `#ffffff`
+- Border-top: `1px solid #eeeeee`
+- Z-index: 40
 
-**Usage:**
-- Grid card image containers
-- Detail view image container
-- Camera preview frame
+**Tab item:**
+- Flex: 1 (equal thirds)
+- Icon: 24px
+- Label: 11px, weight 400
+- Active state: icon + label both `#f5a742`
+- Inactive state: icon + label `#bbbbbb`
+- Tap: no animation (instant)
+
+**V1 note:** Only "Capture" tab is functional. Vocab and Profile show empty states.
+
+### 5.6 Circular Progress Ring
+
+Multicolored segmented ring — shows daily/total capture progress.
+
+```
+     ╭──────╮
+    /  [    ] \
+    \  [    ] /
+     ╰──────╯
+   Segment colors rotate:
+   yellow → green → teal → blue → purple → pink
+```
+
+**Spec:**
+- Size: 120px diameter
+- Stroke width: 6px
+- Gap between segments: ~4deg
+- Segment colors (in order): `#f5d742`, `#7ec87e`, `#52c5c5`, `#6699ee`, `#9b77dd`, `#ee77aa`
+- Background track: `#eeeeee` (full ring, unfilled portion)
+- Implementation: SVG `<circle>` with `stroke-dasharray`
+- Center: empty (white)
+
+**Usage:** Home screen between the greeting and the categories section.
+
+### 5.7 Category Tile Card
+
+2-column grid of colored category cards.
+
+**Container:**
+- Aspect ratio: 1:1
+- Border-radius: 20px
+- Background: category color (solid, muted pastel)
+- Padding: 16px
+- Overflow: hidden
+- No border
+
+**Content layout:**
+```
+┌──────────────────┐
+│ Category Name    │
+│ X Words          │
+│                  │
+│            [img] │  ← object floats bottom-right
+└──────────────────┘
+```
+
+**Category name:** 17px, weight 600, white
+**Word count:** 12px, weight 400, `rgba(255,255,255,0.8)`
+**Object image:** 60px, absolute bottom-right, object-fit contain, no shadow
+
+**Tap state:** `scale(0.97)`, `0.2s ease`
+
+### 5.8 Close / Back Button
+
+Used on capture and detail overlays.
+
+- Size: 36px circle
+- Background: `rgba(255,255,255,0.92)`
+- Box shadow: `0 1px 6px rgba(0,0,0,0.10)`
+- Icon: `‹` (chevron) OR `✕` depending on context
+- Position: absolute, top 16px + safe area, left 16px
+- Z-index: 101
+
+### 5.9 Name Input Field
+
+```css
+width: 100%;
+max-width: 360px;
+padding: 12px 16px;
+border: none;
+border-radius: 20px;
+background: #f5f5f5;      /* light grey, NOT white on white */
+font-size: 14px;
+text-align: center;
+color: #1a1a1a;
+outline: none;
+```
+
+- Placeholder: `#ccc`, text "Name this object..."
+- Focus: background → `#efefef` (slightly darker, no outline)
+- No box shadow (flat, inset feel)
 
 ---
 
-## 6. Shadows & Depth
+## 6. Screens
 
-### 6.1 Drop Shadows (on images)
+### 6.1 Home / Grid Screen
 
-```css
-filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08));
+```
+┌─────────────────────────────────┐
+│  09:01       [status bar]       │
+├─────────────────────────────────┤
+│                                 │
+│  May 19                         │  ← 13px, #999
+│  Good Morning                   │  ← 28px, weight 400
+│  Awesome! You've snapped 2...   │  ← 15px, #999
+│                                 │
+│         (progress ring)         │  ← 120px circular ring
+│                                 │
+│  Collections                    │  ← 17px, weight 600
+│                                 │
+│  ┌──────────┐  ┌──────────┐    │
+│  │ Food &   │  │ People & │    │  ← category tiles
+│  │ Drinks   │  │ Family   │    │
+│  │ 1 Word   │  │ 0 Words  │    │
+│  └──────────┘  └──────────┘    │
+│                                 │
+├─────────────────────────────────┤
+│  [📷]        [🔖]       [👤]   │  ← tab bar
+└─────────────────────────────────┘
 ```
 
-**Properties:**
-- Offset X: 0 (centered)
-- Offset Y: 4px (below)
-- Blur: 12px (soft)
-- Color: rgba(0,0,0,0.08) (very subtle)
+### 6.2 Collection / Object Grid (tapping a category)
 
-**Effect:** Makes floating objects feel like they're slightly above the surface. Very delicate—almost invisible but creates depth.
-
-### 6.2 Box Shadows (on containers)
-
-**Button shadow:**
-```css
-box-shadow: 0 8px 24px rgba(232,180,168,0.3);
+```
+┌─────────────────────────────────┐
+│  ‹  May 19                      │
+│     2 Words                     │
+│                                 │
+│  [image]        [image]         │  ← objects float on white
+│  Object Name    Object Name     │  ← 15px bold
+│  May 19, 2026   May 18, 2026    │  ← 11px, #bbb
+│                                 │
+│         (progress ring)         │
+│                                 │
+├─────────────────────────────────┤
+│  [📷]        [🔖]       [👤]   │
+└─────────────────────────────────┘
 ```
 
-**Close button shadow:**
-```css
-box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+### 6.3 Capture Screen (camera live)
+
+```
+┌─────────────────────────────────┐
+│  ✕                              │
+│                                 │
+│  ┌──────────────────────────┐   │
+│  │                          │   │
+│  │      [live camera]       │   │
+│  │                          │   │
+│  └──────────────────────────┘   │
+│                                 │
+│  [ Name this object...     ]    │
+│                                 │
+│         [↺]  [✓]  [✕]          │  ← only ✓ active while filming
+│                                 │
+│  Point at an object and tap ✓   │
+└─────────────────────────────────┘
 ```
 
-**Input shadow:**
-```css
-box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+### 6.4 Review Screen (after photo taken)
+
+```
+┌─────────────────────────────────┐
+│  ‹  Categories                  │
+│                                 │
+│         ~~~ glow ~~~            │
+│        [  object img  ]         │  ← centered, ~220px
+│         ~~~ glow ~~~            │
+│                                 │
+│      Object Name  🔊            │  ← 22px bold + speaker icon
+│      May 19, 2026               │  ← 14px, #999
+│                                 │
+│      [↺]    [  ✓  ]    [✕]     │  ← three-button row
+│                                 │
+│  Not what you expected?         │
+│  Tap to adjust                  │
+└─────────────────────────────────┘
 ```
 
-**Pattern:** Larger, softer shadows on interactive elements. Smaller shadows on containers.
+### 6.5 Detail View
+
+```
+┌─────────────────────────────────┐
+│  ✕                              │
+│                                 │
+│         ~~~ glow ~~~            │
+│       [   object img   ]        │  ← 80% screen width
+│         ~~~ glow ~~~            │
+│                                 │
+│       Object Name               │  ← 22px bold, centered
+│       May 19, 2026              │  ← 14px, #999, centered
+│                                 │
+└─────────────────────────────────┘
+```
 
 ---
 
-## 7. Dotted Background Texture
+## 7. Shadows & Depth
 
-### 7.1 Implementation
+### 7.1 Object Drop Shadow (grid)
 
 ```css
-background-image: radial-gradient(circle, #d9cfc5 0.5px, transparent 0.5px);
-background-size: 24px 24px;
-opacity: 0.12;
+filter: drop-shadow(0 6px 16px rgba(0,0,0,0.12));
 ```
 
-**Properties:**
-- Dot size: 0.5px
-- Dot spacing: 24px
-- Dot color: #d9cfc5 (muted taupe)
-- Opacity: 12% (very subtle—almost invisible)
+Slightly more visible than before — white bg means shadow is the only depth cue.
 
-**Effect:** Adds texture without visual noise. Like looking at faintly dotted paper. Supports the "cottagecore memory journal" vibe without being distracting.
+### 7.2 Object Drop Shadow (review/detail)
 
-**Placement:** Fixed, behind all content (position fixed, inset 0, z-index 0).
+```css
+filter: drop-shadow(0 8px 20px rgba(0,0,0,0.15));
+```
+
+Deeper shadow on white + glow background.
+
+### 7.3 Button Shadows
+
+```css
+/* FAB */
+box-shadow: 0 6px 20px rgba(245,167,66,0.35);
+
+/* Close/back button */
+box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+```
+
+No shadow on input fields (flat grey bg does the job).
 
 ---
 
 ## 8. Interactions & Animations
 
-### 8.1 Tap Feedback
+### 8.1 Tap States
 
-**Card tap:**
-```css
-transform: scale(0.98);
-transition: transform 0.3s ease;
-```
-
-**Button tap:**
-```css
-transform: scale(0.95);
-transition: transform 0.2s ease;
-```
-
-**Why:** Haptic-like feedback without vibration API. Confirms tap was registered.
+| Element | Transform | Duration |
+|---------|-----------|----------|
+| Grid card | scale(0.97) | 0.2s ease |
+| FAB | scale(0.95) | 0.15s ease |
+| Confirm button (✓) | scale(0.93) | 0.15s ease |
+| Replay / Reject | scale(0.95) | 0.15s ease |
+| Category tile | scale(0.97) | 0.2s ease |
+| Tab item | none | instant |
 
 ### 8.2 View Transitions
 
-**Grid → Capture:**
-- Capture view fades in as overlay (no animation, instant)
-- Camera stream loads (no delay shown)
-
-**Grid → Detail:**
-- Detail view overlays instantly
-- Image stays in place visually (no zoom animation)
-
-**Capture/Detail → Grid:**
-- Close button triggers instant return
-- No slide/fade animation (too slow for minimal interface)
-
-**Philosophy:** Instant transitions keep the interface responsive and focused. No motion for motion's sake.
+| Transition | Animation | Duration |
+|------------|-----------|----------|
+| Grid → Capture | slide up from bottom | 0.3s ease |
+| Grid → Detail | fade in overlay | 0.2s ease |
+| Review → Grid (confirm) | quick fade out | 0.2s ease |
+| Review → Grid (reject) | instant | — |
+| Any → Grid (back/close) | reverse of open | 0.2s ease |
 
 ### 8.3 Loading States
 
-**Photo capture:**
-- Button text changes to "..." (optional)
-- Button disabled (opacity 0.6)
-- Camera feed stays visible during processing
-
-**Camera startup:**
-- Video element loads via getUserMedia
-- Show dark placeholder while loading (camera bg color #1a1a1a)
+- **Photo capture:** Confirm button disabled, shows spinner or `…`
+- **Camera startup:** Dark `#1a1a1a` bg while stream loads
+- **Image in grid:** No placeholder (images load from localStorage, near-instant)
 
 ---
 
 ## 9. Responsive Behavior
 
-### 9.1 Mobile (Default: 375px–667px)
+### 9.1 Mobile (375px–667px) — MVP target
 
-- 2-column grid (20px gap)
-- 16px left/right padding
-- All components centered
-- FAB always visible (bottom-right)
+- 2-column object grid, 16px gap
+- Tab bar always fixed at bottom
+- FAB above tab bar (bottom: 72px)
+- All overlays are full-screen
 
-### 9.2 Tablet/Desktop (Future)
+### 9.2 Larger phones (390px–430px)
 
-- 3–4 column grid
-- Larger image containers
-- Sidebar optional
-- Desktop-optimized detail view
+- Grid cards grow proportionally (grid is `1fr 1fr`, inherits width)
+- No layout changes needed
 
-**Note:** MVP is mobile-first. Desktop support can be added in phase 2.
+### 9.3 Tablet/Desktop — Future
+
+Out of scope for V1. Not designed.
 
 ---
 
@@ -445,32 +550,28 @@ transition: transform 0.2s ease;
 
 ### 10.1 Color Contrast
 
-| Combination | Ratio | Level |
-|-------------|-------|-------|
-| #1a1a1a (text) on #faf8f6 (bg) | 15.2:1 | AAA |
-| #999 (secondary) on #faf8f6 | 6.8:1 | AA |
-| white on #e8b4a8 (button) | 4.5:1 | AA |
-
-**All combinations meet WCAG AA standard at minimum.**
+| Pair | Ratio | WCAG |
+|------|-------|------|
+| `#1a1a1a` on `#ffffff` | 16.1:1 | AAA |
+| `#999` on `#ffffff` | 3.9:1 | AA (large text) |
+| `#ffffff` on `#f5a742` | 3.1:1 | AA (large/bold) |
+| `#ffffff` on `#9585bf` | 4.6:1 | AA |
+| `#ffffff` on `#8a9a64` | 3.5:1 | AA (large/bold) |
 
 ### 10.2 Touch Targets
 
-- Buttons: 44px–60px (optimal for thumbs)
-- Cards: Full card is tappable (minimum 150px on 2-column)
-- Close button: 40px (sufficient)
+| Element | Size |
+|---------|------|
+| FAB | 58px ✓ |
+| Tab bar item | full 1/3 width × 56px ✓ |
+| Confirm button | 60px ✓ |
+| Replay / Reject | 52px ✓ |
+| Back / close | 36px ⚠️ (borderline — ensure tap area is padded to 44px) |
+| Grid card | ~160px+ ✓ |
 
-### 10.3 Typography
+### 10.3 Motion
 
-- Minimum font size: 11px (dates—acceptable for secondary)
-- Body text: 14px+ (readable)
-- Headings: 28px+ (clear hierarchy)
-- Line height: 1.3–1.4 (good readability)
-
-### 10.4 Motion
-
-- Animations: 0.2–0.3s (fast, non-disruptive)
-- No autoplaying videos or content
-- Camera feed: user-initiated only
+- All animations 0.15–0.3s, no looping, no autoplay
 
 ---
 
@@ -478,177 +579,113 @@ transition: transform 0.2s ease;
 
 ```css
 :root {
-  /* Colors */
-  --color-bg-light: #faf8f6;
-  --color-bg-dark: #f5f2ef;
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #999;
-  --color-text-tertiary: #bbb;
-  --color-accent-warm: #e8b4a8;
-  --color-accent-warm-dark: #d9a896;
-  --color-glass: rgba(255, 255, 255, 0.5);
+  /* Background */
+  --color-bg:             #ffffff;
+  --color-surface:        #f7f7f7;
+  --color-divider:        #eeeeee;
+
+  /* Text */
+  --color-text-primary:   #1a1a1a;
+  --color-text-secondary: #999999;
+  --color-text-tertiary:  #bbbbbb;
+
+  /* Accent */
+  --color-accent:         #f5a742;
+  --color-accent-dark:    #e8962e;
+  --color-accent-glow:    rgba(245,167,66,0.35);
+
+  /* Category tiles */
+  --color-cat-food:       #9585bf;
+  --color-cat-people:     #7fa0c0;
+  --color-cat-body:       #9a7aaa;
+  --color-cat-nature:     #8a9a64;
+  --color-cat-home:       #b07882;
+  --color-cat-school:     #a89060;
+
+  /* Functional */
+  --color-camera-bg:      #1a1a1a;
+  --color-btn-neutral:    #efefef;
 
   /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-size-xs: 11px;
-  --font-size-sm: 13px;
-  --font-size-base: 14px;
-  --font-size-lg: 28px;
-  --font-size-xl: 32px;
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
+  --font:         -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fs-xs:        11px;
+  --fs-sm:        13px;
+  --fs-base:      14px;
+  --fs-md:        15px;
+  --fs-lg:        17px;
+  --fs-xl:        22px;
+  --fs-2xl:       28px;
+  --fw-regular:   400;
+  --fw-semibold:  600;
+  --fw-bold:      700;   /* ← object names */
 
   /* Spacing */
-  --space-sm: 12px;
-  --space-md: 16px;
-  --space-lg: 20px;
-  --space-xl: 24px;
-  --space-2xl: 32px;
-  --space-3xl: 48px;
+  --sp-xs:   4px;
+  --sp-sm:   8px;
+  --sp-md:   12px;
+  --sp-lg:   16px;
+  --sp-xl:   20px;
+  --sp-2xl:  24px;
+  --sp-3xl:  32px;
+  --sp-4xl:  48px;
 
-  /* Border Radius */
-  --radius-sm: 12px;
-  --radius-md: 24px;
-  --radius-full: 50%;
+  /* Radii */
+  --r-sm:    12px;
+  --r-md:    20px;
+  --r-lg:    24px;
+  --r-full:  50%;
 
   /* Shadows */
-  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(232, 180, 168, 0.3);
+  --sh-object:    drop-shadow(0 6px 16px rgba(0,0,0,0.12));
+  --sh-object-lg: drop-shadow(0 8px 20px rgba(0,0,0,0.15));
+  --sh-fab:       0 6px 20px rgba(245,167,66,0.35);
+  --sh-close:     0 1px 6px rgba(0,0,0,0.10);
 
   /* Transitions */
-  --transition-fast: 0.2s ease;
-  --transition-base: 0.3s ease;
+  --tx-fast:  0.15s ease;
+  --tx-base:  0.2s ease;
+  --tx-slow:  0.3s ease;
 }
 ```
 
 ---
 
-## 12. Visual Examples
+## 12. What Changed from v1.0 (Change Log)
 
-### 12.1 Layout Pattern: Grid View
-
-```
-┌─────────────────────────────────┐
-│  09:41          [status bar]    │
-├─────────────────────────────────┤
-│                                 │
-│  Memories                       │
-│  4 objects collected            │
-│                                 │
-│  ┌──────────┐  ┌──────────┐    │
-│  │  Image   │  │  Image   │    │
-│  │  (float) │  │  (float) │    │
-│  └──────────┘  └──────────┘    │
-│  Object name   Object name      │
-│  May 15, 2024  May 14, 2024     │
-│                                 │
-│  ┌──────────┐  ┌──────────┐    │
-│  │  Image   │  │  Image   │    │
-│  │  (float) │  │  (float) │    │
-│  └──────────┘  └──────────┘    │
-│  Object name   Object name      │
-│  May 13, 2024  May 12, 2024     │
-│                                 │
-│                          [+]    │  ← FAB
-└─────────────────────────────────┘
-```
-
-### 12.2 Layout Pattern: Capture View
-
-```
-┌─────────────────────────────────┐
-│ [X]                             │
-│                                 │
-│      ┌──────────────┐           │
-│      │ Camera feed  │           │
-│      │ (live video) │           │
-│      └──────────────┘           │
-│                                 │
-│    Name this object...          │  ← Input
-│                                 │
-│           [✓]                   │  ← Capture button
-│                                 │
-│  Point at an object and tap     │  ← Hint
-│  to capture                     │
-└─────────────────────────────────┘
-```
-
-### 12.3 Layout Pattern: Detail View
-
-```
-┌─────────────────────────────────┐
-│ [X]                             │
-│                                 │
-│      ┌──────────────┐           │
-│      │              │           │
-│      │ Floating     │           │
-│      │ Image        │           │
-│      │              │           │
-│      └──────────────┘           │
-│                                 │
-│     Vintage Key                 │  ← Object name
-│                                 │
-│     May 15, 2024                │  ← Date
-│                                 │
-└─────────────────────────────────┘
-```
+| Area | Old | New |
+|------|-----|-----|
+| Background | `#faf8f6` cream gradient | `#ffffff` white |
+| Grid cards | Glass container (rgba white, blur) | No container — image floats on white |
+| Object name weight | 500 (medium) | **700 (bold)** |
+| Accent color | `#e8b4a8` peachy beige | `#f5a742` warm orange |
+| Dotted texture | Yes (opacity 0.12) | **Removed** |
+| Button gradient | Peach-to-brown | Solid orange |
+| Detail screen | Glass container | White bg + radial glow behind image |
+| Navigation | FAB only | Tab bar + FAB |
+| New: Review screen | Not in spec | Added (3-button row) |
+| New: Progress ring | Not in spec | Added (multicolor SVG) |
+| New: Category tiles | Not in spec | Added (6 muted pastel colors) |
 
 ---
 
-## 13. Brand Voice in Design
+## 13. Design Checklist (Updated)
 
-**How design communicates:**
-
-| Aspect | Expression | Example |
-|--------|-----------|---------|
-| Hierarchy | Let objects speak first | Images take 80% of space |
-| Simplicity | Remove anything unnecessary | No borders, no shadows until needed |
-| Softness | Warm, inviting, not cold | Rounded edges, warm colors, glass containers |
-| Focus | Minimal distractions | Dotted background barely visible |
-| Respect for user | Honors their memories | No clutter, no ads, no noise |
-
----
-
-## 14. Design Checklist
-
-Before launching, verify:
-
-- [ ] All text meets WCAG AA contrast ratio
-- [ ] Touch targets are 44px minimum
-- [ ] Buttons have hover/active states (even on mobile)
-- [ ] Images load with placeholder (or skeleton)
-- [ ] Close buttons work on all views
-- [ ] FAB always visible and responsive
-- [ ] Dotted background is subtle (opacity 0.12)
-- [ ] Glass containers have proper backdrop-filter support
-- [ ] Shadows are soft and consistent
-- [ ] Typography hierarchy is clear
-- [ ] Spacing is proportional (4px base)
-- [ ] Colors match palette exactly
-- [ ] No layout shifts when images load
+- [ ] Background is pure white on all screens
+- [ ] Grid objects float with no card container
+- [ ] Object names are bold (weight 700)
+- [ ] Orange accent (`#f5a742`) used for FAB, confirm button, active tab
+- [ ] Tab bar is fixed at bottom with safe area padding
+- [ ] Category tiles use correct muted pastel colors
+- [ ] Warm glow appears behind objects on detail/review screens
+- [ ] Three-button review row is properly sized (Confirm > Replay/Reject)
+- [ ] All text meets WCAG AA contrast
+- [ ] Touch targets 44px minimum (pad close button tap area)
+- [ ] Drop shadows are the only depth cue in the grid
+- [ ] No gradients on backgrounds (solid white only)
 
 ---
 
-## 15. Future Design Considerations
-
-**Phase 2:**
-- Dark mode (optional)
-- Categories/collections (UI expansion)
-- Search functionality (new component)
-- Filtering/sorting (subtle controls)
-
-**Phase 3:**
-- Sharing cards (design for social context)
-- Export options (PDF, print-friendly)
-- Desktop layout (multi-column, sidebar)
-
-**Design Principle:** Maintain minimalism as features grow. Complexity should be hidden, not visible.
-
----
-
-**Design System Version:** 1.0
+**Design System Version:** 2.0
 **Last Updated:** May 24, 2026
-**Created by:** Vidhi (Product + Design)
+**Updated by:** Vidhi × Claude (based on CapWords visual reference)
+**Breaking changes from v1.0:** See Section 12
