@@ -444,11 +444,21 @@ let _removeBackground = null;
 async function getBgRemover() {
   if (_removeBackground) return _removeBackground;
   // Dynamically import the ESM library from jsDelivr CDN
-  const mod = await import(
-    'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs'
-  );
-  _removeBackground = mod.removeBackground;
-  return _removeBackground;
+  try {
+    console.log('[imgly] Importing library...');
+    const mod = await import(
+      'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/index.mjs'
+    );
+    console.log('[imgly] Import successful, exports:', Object.keys(mod));
+    _removeBackground = mod.removeBackground || mod.default;
+    if (!_removeBackground) {
+      throw new Error('removeBackground export not found in module');
+    }
+    return _removeBackground;
+  } catch (err) {
+    console.error('[imgly] Import failed:', err.message || err);
+    throw err;
+  }
 }
 
 async function removeBackground(jpegDataURL) {
