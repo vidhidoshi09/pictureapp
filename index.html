@@ -435,40 +435,33 @@ function captureFrame() {
 }
 
 /* ════════════════════════════════════════════════
-   STEP 2 — BACKGROUND REMOVAL
-   Uses @imgly/background-removal — 100% in-browser,
-   no API key, no server, completely free.
+   STEP 2 — BACKGROUND REMOVAL via remove.bg API
 ════════════════════════════════════════════════ */
-let _removeBg = null;
-
-async function loadBgRemover() {
-  if (_removeBg) return _removeBg;
-
-  console.log('[imgly] Importing library...');
-  const mod = await import(
-    'https://unpkg.com/@imgly/background-removal@1.7.0/dist/index.mjs'
-  );
-  console.log('[imgly] Loaded, exports:', Object.keys(mod));
-  _removeBg = mod.removeBackground;
-  return _removeBg;
-}
-
 async function removeBackground(jpegDataURL) {
-  const removeBg = await loadBgRemover();
-
-  const res = await fetch(jpegDataURL);
+  // Convert data URL → Blob
+  const res  = await fetch(jpegDataURL);
   const blob = await res.blob();
 
-  console.log('[imgly] Processing image...');
+  // Build multipart form for remove.bg
+  const form = new FormData();
+  form.append('image_file', blob, 'photo.jpg');
+  form.append('size', 'auto');
 
-  // Use imgly's own CDN where models are actually hosted
-  const result = await removeBg(blob, {
-    publicPath: 'https://staticimgly.com/@imgly/background-removal-data/1.7.0/dist/',
-    output: { format: 'image/png', quality: 0.9 },
+  console.log('[removebg] Sending to API...');
+
+  const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+    method: 'POST',
+    headers: { 'X-Api-Key': 'mkvyD4Lt9VciJAMLPwUip9Ws' },
+    body: form,
   });
 
-  console.log('[imgly] Done');
-  return result instanceof Blob ? result : await result.blob();
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err?.errors?.[0]?.title || `remove.bg ${response.status}`);
+  }
+
+  console.log('[removebg] Done');
+  return response.blob(); // PNG with transparent background
 }
 
 /* ════════════════════════════════════════════════
