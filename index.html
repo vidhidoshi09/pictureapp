@@ -132,7 +132,7 @@
       flex-direction: column;
     }
 
-    #camera-video { flex: 1; width: 100%; object-fit: cover; display: block; }
+    #camera-video { flex: 1; width: 100%; object-fit: cover; display: block; transform: scaleX(-1); }
 
     .cam-denied {
       display: none; flex: 1; flex-direction: column;
@@ -430,7 +430,12 @@ function captureFrame() {
   const vh = video.videoHeight || 1280;
   const side = Math.min(vw, vh);
   canvas.width = canvas.height = 1024;
-  canvas.getContext('2d').drawImage(video, (vw-side)/2, (vh-side)/2, side, side, 0, 0, 1024, 1024);
+  const ctx = canvas.getContext('2d');
+  // Mirror horizontally to match the flipped preview
+  ctx.save();
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, (vw-side)/2, (vh-side)/2, side, side, -1024, 0, 1024, 1024);
+  ctx.restore();
   return canvas.toDataURL('image/jpeg', 0.92);
 }
 
