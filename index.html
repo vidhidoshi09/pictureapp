@@ -461,12 +461,13 @@ async function removeBackground(jpegDataURL) {
 
   console.log('[imgly] Processing image...');
 
-  // Call with NO publicPath — let the library use its built-in CDN default
+  // Use imgly's own CDN where models are actually hosted
   const result = await removeBg(blob, {
+    publicPath: 'https://staticimgly.com/@imgly/background-removal-data/1.7.0/dist/',
     output: { format: 'image/png', quality: 0.9 },
   });
 
-  console.log('[imgly] Done:', result);
+  console.log('[imgly] Done');
   return result instanceof Blob ? result : await result.blob();
 }
 
