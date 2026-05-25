@@ -158,122 +158,101 @@
     #shutter-btn:active { transform: scale(0.91); background: #ccc; }
 
     /* ═══════════════════════════════════════
-       STEP 2 — PROCESSING (bg removal)
+       STEP 2 — SCISSORS CUT ANIMATION
     ═══════════════════════════════════════ */
     #processing-overlay {
       background: var(--color-bg);
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 28px;
     }
 
-    /* ── Loader previews ──────────────────────── */
-    .loader-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px 24px;
-      width: 100%;
-      max-width: 320px;
-    }
-    .loader-cell {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-    .loader-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: var(--color-text-tertiary);
-    }
-
-    /* 1 — Bouncing dots */
-    .dots {
-      display: flex; gap: 8px; align-items: flex-end; height: 28px;
-    }
-    .dots span {
-      width: 9px; height: 9px; border-radius: 50%;
-      background: var(--color-accent);
-      animation: bounce 0.9s ease-in-out infinite;
-    }
-    .dots span:nth-child(2) { animation-delay: 0.15s; }
-    .dots span:nth-child(3) { animation-delay: 0.30s; }
-    @keyframes bounce {
-      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-      40%            { transform: translateY(-14px); opacity: 1; }
-    }
-
-    /* 2 — Pulsing ring */
-    .ring-wrap { width: 44px; height: 44px; position: relative; }
-    .ring {
-      position: absolute; inset: 0;
-      border-radius: 50%;
-      border: 2.5px solid var(--color-accent);
-      animation: ripple 1.4s ease-out infinite;
-    }
-    .ring:nth-child(2) { animation-delay: 0.5s; }
-    .ring-dot {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 10px; height: 10px;
-      border-radius: 50%; background: var(--color-accent);
-    }
-    @keyframes ripple {
-      0%   { transform: scale(0.3); opacity: 1; }
-      100% { transform: scale(1.8); opacity: 0; }
-    }
-
-    /* 3 — Scissor scan */
-    .scan-wrap {
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      background: rgba(245,167,66,0.08);
-      overflow: hidden;
+    /* Image preview with scissors cutting around it */
+    .cut-stage {
       position: relative;
-    }
-    .scan-line {
-      position: absolute; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
-      box-shadow: 0 0 8px var(--color-accent);
-      animation: scan 1.6s ease-in-out infinite;
-    }
-    .scan-scissors {
-      position: absolute; left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 20px; opacity: 0.18;
-    }
-    @keyframes scan {
-      0%   { top: 0; }
-      50%  { top: calc(100% - 2px); }
-      100% { top: 0; }
+      width: 240px;
+      height: 240px;
     }
 
-    /* 4 — Morphing blob */
-    .blob {
-      width: 40px; height: 40px;
-      background: var(--color-accent);
-      opacity: 0.85;
-      animation: morph 3s ease-in-out infinite;
+    /* The photo being "cut" */
+    .cut-stage__img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+      display: block;
     }
-    @keyframes morph {
-      0%   { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-      33%  { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
-      66%  { border-radius: 50% 60% 30% 60% / 30% 40% 70% 50%; }
-      100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+
+    /* SVG overlay for the dashed cut line */
+    .cut-stage__svg {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      overflow: visible;
+    }
+
+    /* The dashed cut path — draws itself as scissors move */
+    .cut-path {
+      fill: none;
+      stroke: var(--color-accent);
+      stroke-width: 2.5;
+      stroke-dasharray: 8 6;
+      stroke-linecap: round;
+      /* Perimeter of 240×240 rounded rect with r=20 ≈ 926px */
+      stroke-dashoffset: 926;
+      animation: draw-cut 3s linear infinite;
+      filter: drop-shadow(0 0 3px rgba(245,167,66,0.5));
+    }
+    @keyframes draw-cut {
+      0%   { stroke-dashoffset: 926; }
+      100% { stroke-dashoffset: 0;   }
+    }
+
+    /* Scissors emoji riding along the path */
+    .cut-scissors {
+      position: absolute;
+      font-size: 22px;
+      line-height: 1;
+      /* Start top-left, offset slightly outside border */
+      offset-path: path('M20,0 L220,0 Q240,0 240,20 L240,220 Q240,240 220,240 L20,240 Q0,240 0,220 L0,20 Q0,0 20,0 Z');
+      offset-distance: 0%;
+      offset-rotate: auto;
+      animation: scissors-ride 3s linear infinite;
+      transform-origin: center;
+      /* Shift scissors to ride outside the line */
+      margin-left: -11px;
+      margin-top: -11px;
+    }
+    @keyframes scissors-ride {
+      0%   { offset-distance: 0%;   }
+      100% { offset-distance: 100%; }
+    }
+
+    /* Background dims as cut progresses */
+    .cut-stage::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: rgba(237,236,234,0);
+      animation: bg-fade 3s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes bg-fade {
+      0%   { background: rgba(237,236,234,0); }
+      90%  { background: rgba(237,236,234,0); }
+      95%  { background: rgba(237,236,234,0.5); }
+      100% { background: rgba(237,236,234,0); }
     }
 
     .processing-label {
       font-family: var(--font-display);
       font-size: var(--fs-md); font-weight: var(--fw-bold);
       color: var(--color-text-primary);
-      margin-top: 8px;
     }
     .processing-sub {
       font-size: var(--fs-sm); color: var(--color-text-secondary); text-align: center;
+      margin-top: -16px;
     }
 
     /* ═══════════════════════════════════════
@@ -380,40 +359,16 @@
 
 <!-- STEP 2 — PROCESSING ──────────────────── -->
 <div id="processing-overlay" class="overlay" role="status" aria-label="Removing background">
-  <div class="loader-grid">
-
-    <div class="loader-cell">
-      <div class="dots">
-        <span></span><span></span><span></span>
-      </div>
-      <span class="loader-label">Bouncing</span>
-    </div>
-
-    <div class="loader-cell">
-      <div class="ring-wrap">
-        <div class="ring"></div>
-        <div class="ring"></div>
-        <div class="ring-dot"></div>
-      </div>
-      <span class="loader-label">Pulse ring</span>
-    </div>
-
-    <div class="loader-cell">
-      <div class="scan-wrap">
-        <div class="scan-scissors">✂️</div>
-        <div class="scan-line"></div>
-      </div>
-      <span class="loader-label">Scissor scan</span>
-    </div>
-
-    <div class="loader-cell">
-      <div class="blob"></div>
-      <span class="loader-label">Blob morph</span>
-    </div>
-
+  <div class="cut-stage">
+    <img id="proc-preview" class="cut-stage__img" src="" alt="" />
+    <svg class="cut-stage__svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+      <path class="cut-path"
+        d="M20,0 L220,0 Q240,0 240,20 L240,220 Q240,240 220,240 L20,240 Q0,240 0,220 L0,20 Q0,0 20,0 Z" />
+    </svg>
+    <div class="cut-scissors">✂️</div>
   </div>
-  <p class="processing-label">Which one? ☝️</p>
-  <p class="processing-sub">Removing background…</p>
+  <p class="processing-label">Cutting background…</p>
+  <p class="processing-sub">Just a moment</p>
 </div>
 
 <!-- STEP 3 — REVIEW ──────────────────────── -->
@@ -659,7 +614,8 @@ async function onShutterPressed() {
   stopCamera();
   hideOverlay('camera-overlay');
 
-  // 2. Show processing spinner
+  // 2. Show processing overlay — set photo as cut-stage preview
+  document.getElementById('proc-preview').src = jpegDataURL;
   showOverlay('processing-overlay');
 
   try {
