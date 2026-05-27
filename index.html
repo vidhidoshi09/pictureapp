@@ -9,7 +9,7 @@
   <title>Memories</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
     /* ── Tokens ──────────────────────────────────────────────────── */
     :root {
@@ -22,9 +22,9 @@
       --color-camera-bg:      #000000;
 
       --font:         -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-display: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Nunito Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --fs-xs: 11px; --fs-sm: 13px; --fs-base: 14px; --fs-md: 15px; --fs-xl: 28px;
-      --fw-reg: 400; --fw-semi: 600; --fw-bold: 800;
+      --fw-reg: 400; --fw-semi: 700; --fw-bold: 900;
 
       --sp-sm: 8px; --sp-md: 12px; --sp-lg: 16px;
       --sp-xl: 20px; --sp-2xl: 24px; --sp-3xl: 32px;
@@ -81,9 +81,25 @@
     .card:active { transform: scale(0.97); }
 
     .card__img-wrap { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
-    .card__img-wrap img { width: 90%; height: 90%; object-fit: contain; filter: var(--sh-object); mix-blend-mode: multiply; }
+    .card__img-wrap img {
+      width: 90%; height: 90%; object-fit: contain; mix-blend-mode: multiply;
+      /* Outline stroke around object edges */
+      filter:
+        drop-shadow(0 0 0px #fff)
+        drop-shadow( 1.5px  0px   0 #111)
+        drop-shadow(-1.5px  0px   0 #111)
+        drop-shadow( 0px    1.5px 0 #111)
+        drop-shadow( 0px   -1.5px 0 #111)
+        drop-shadow(0 6px 18px rgba(0,0,0,0.12));
+    }
 
-    .card__name { font-family: var(--font-display); font-size: var(--fs-md); font-weight: var(--fw-bold); letter-spacing: -0.2px; color: var(--color-text-primary); text-align: center; margin-top: var(--sp-sm); line-height: 1.2; }
+    .card__name {
+      font-family: var(--font-display); font-size: var(--fs-md); font-weight: var(--fw-bold);
+      letter-spacing: -0.2px; color: var(--color-text-primary);
+      text-align: center; margin-top: var(--sp-sm); line-height: 1.2;
+      /* Text stroke */
+      -webkit-text-stroke: 0.4px rgba(0,0,0,0.35);
+    }
     .card__date  { font-size: var(--fs-xs); color: var(--color-text-tertiary); text-align: center; margin-top: 4px; }
 
     /* FAB */
