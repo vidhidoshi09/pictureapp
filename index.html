@@ -212,35 +212,35 @@
       overflow: visible;
     }
 
-    /* Layer 1 — solid orange stroke that GROWS from 0 to full
-       perimeter ≈ 942px for this slightly larger viewBox           */
+    /* Layer 1 — full dashed line always visible from the start */
     .cut-trace {
       fill: none;
       stroke: var(--color-accent);
-      stroke-width: 3.5;
-      stroke-linecap: butt;
-      stroke-dasharray: 942;   /* one big dash = full perimeter */
-      stroke-dashoffset: 942;  /* start invisible */
-      animation: grow-trace 2.8s linear infinite;
-      filter: drop-shadow(0 0 5px rgba(245,167,66,0.55));
-    }
-    @keyframes grow-trace {
-      0%    { stroke-dashoffset: 942; } /* no line — scissors only */
-      96%   { stroke-dashoffset: 0;   } /* full circle complete   */
-      100%  { stroke-dashoffset: 942; } /* instant reset          */
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dasharray: 8 7;
+      opacity: 0.35;
+      filter: drop-shadow(0 0 3px rgba(245,167,66,0.4));
     }
 
-    /* Layer 2 — white gap mask ON TOP of the orange trace
-       creates the dashed appearance as orange appears beneath     */
-    .cut-gaps {
+    /* Layer 2 — bright solid segment that lights up where scissors has been */
+    .cut-done {
       fill: none;
-      stroke: #edecea;          /* exact app background colour */
-      stroke-width: 4;
-      stroke-linecap: butt;
-      stroke-dasharray: 5 9;    /* 5px white gap, 9px orange shows */
+      stroke: var(--color-accent);
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-dasharray: 942;
+      stroke-dashoffset: 942;
+      animation: grow-done 2.8s linear infinite;
+      filter: drop-shadow(0 0 5px rgba(245,167,66,0.7));
+    }
+    @keyframes grow-done {
+      0%   { stroke-dashoffset: 942; }
+      96%  { stroke-dashoffset: 0;   }
+      100% { stroke-dashoffset: 942; }
     }
 
-    /* Scissors — rides at the exact leading edge, same 2.8s duration */
+    /* Scissors — follows the line, same 2.8s */
     .cut-scissors {
       position: absolute;
       font-size: 22px;
@@ -372,11 +372,11 @@
   <div class="cut-stage">
     <img id="proc-preview" class="cut-stage__img" src="" alt="" />
     <svg class="cut-stage__svg" viewBox="0 0 246 246" xmlns="http://www.w3.org/2000/svg">
-      <!-- orange trace grows from nothing as scissors moves -->
+      <!-- faint dashed guide — full line visible from start, scissors follows it -->
       <path class="cut-trace"
         d="M22,12 L222,12 Q234,12 234,24 L234,222 Q234,234 222,234 L22,234 Q12,234 12,222 L12,24 Q12,12 22,12 Z" />
-      <!-- white gaps on top turn solid trace into dashes -->
-      <path class="cut-gaps"
+      <!-- bright solid segment lights up where scissors has already cut -->
+      <path class="cut-done"
         d="M22,12 L222,12 Q234,12 234,24 L234,222 Q234,234 222,234 L22,234 Q12,234 12,222 L12,24 Q12,12 22,12 Z" />
     </svg>
     <div class="cut-scissors">✂️</div>
