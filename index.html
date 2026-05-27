@@ -203,52 +203,52 @@
       display: block;
     }
 
-    /* SVG overlay — two layered paths */
+    /* SVG overlay */
     .cut-stage__svg {
       position: absolute;
-      inset: -10px; /* bleed so scissors don't clip at corners */
-      width: calc(100% + 20px);
-      height: calc(100% + 20px);
+      inset: -12px;
+      width: calc(100% + 24px);
+      height: calc(100% + 24px);
       overflow: visible;
     }
 
-    /* Path 1: faint dashed guide — always fully visible (ahead of scissors) */
-    .cut-guide {
-      fill: none;
-      stroke: rgba(245,167,66,0.25);
-      stroke-width: 2;
-      stroke-dasharray: 8 6;
-      stroke-linecap: round;
-    }
-
-    /* Path 2: bright solid trace — grows from 0 to full behind scissors
-       stroke-dasharray: 926 = one big dash equal to full perimeter
-       stroke-dashoffset 926→0 reveals it from position-0 forward         */
+    /* Layer 1 — solid orange stroke that GROWS from 0 to full
+       perimeter ≈ 942px for this slightly larger viewBox           */
     .cut-trace {
       fill: none;
       stroke: var(--color-accent);
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-dasharray: 926;
-      stroke-dashoffset: 926;
-      animation: grow-trace 3s linear infinite;
-      filter: drop-shadow(0 0 4px rgba(245,167,66,0.6));
+      stroke-width: 3.5;
+      stroke-linecap: butt;
+      stroke-dasharray: 942;   /* one big dash = full perimeter */
+      stroke-dashoffset: 942;  /* start invisible */
+      animation: grow-trace 2.8s linear infinite;
+      filter: drop-shadow(0 0 5px rgba(245,167,66,0.55));
     }
     @keyframes grow-trace {
-      0%   { stroke-dashoffset: 926; }
-      98%  { stroke-dashoffset: 0;   }
-      100% { stroke-dashoffset: 926; } /* instant reset */
+      0%    { stroke-dashoffset: 942; } /* no line — scissors only */
+      96%   { stroke-dashoffset: 0;   } /* full circle complete   */
+      100%  { stroke-dashoffset: 942; } /* instant reset          */
     }
 
-    /* Scissors emoji — perfectly synced with the trace front */
+    /* Layer 2 — white gap mask ON TOP of the orange trace
+       creates the dashed appearance as orange appears beneath     */
+    .cut-gaps {
+      fill: none;
+      stroke: #edecea;          /* exact app background colour */
+      stroke-width: 4;
+      stroke-linecap: butt;
+      stroke-dasharray: 5 9;    /* 5px white gap, 9px orange shows */
+    }
+
+    /* Scissors — rides at the exact leading edge, same 2.8s duration */
     .cut-scissors {
       position: absolute;
-      font-size: 24px;
+      font-size: 22px;
       line-height: 1;
-      offset-path: path('M20,10 L220,10 Q230,10 230,20 L230,220 Q230,230 220,230 L20,230 Q10,230 10,220 L10,20 Q10,10 20,10 Z');
+      offset-path: path('M22,12 L222,12 Q234,12 234,24 L234,222 Q234,234 222,234 L22,234 Q12,234 12,222 L12,24 Q12,12 22,12 Z');
       offset-distance: 0%;
       offset-rotate: auto;
-      animation: scissors-ride 3s linear infinite;
+      animation: scissors-ride 2.8s linear infinite;
     }
     @keyframes scissors-ride {
       0%   { offset-distance: 0%;   }
@@ -371,13 +371,13 @@
 <div id="processing-overlay" class="overlay" role="status" aria-label="Removing background">
   <div class="cut-stage">
     <img id="proc-preview" class="cut-stage__img" src="" alt="" />
-    <svg class="cut-stage__svg" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-      <!-- faint dashed guide: full border always visible -->
-      <path class="cut-guide"
-        d="M20,0 L220,0 Q240,0 240,20 L240,220 Q240,240 220,240 L20,240 Q0,240 0,220 L0,20 Q0,0 20,0 Z" />
-      <!-- bright trace: grows behind scissors -->
+    <svg class="cut-stage__svg" viewBox="0 0 246 246" xmlns="http://www.w3.org/2000/svg">
+      <!-- orange trace grows from nothing as scissors moves -->
       <path class="cut-trace"
-        d="M20,0 L220,0 Q240,0 240,20 L240,220 Q240,240 220,240 L20,240 Q0,240 0,220 L0,20 Q0,0 20,0 Z" />
+        d="M22,12 L222,12 Q234,12 234,24 L234,222 Q234,234 222,234 L22,234 Q12,234 12,222 L12,24 Q12,12 22,12 Z" />
+      <!-- white gaps on top turn solid trace into dashes -->
+      <path class="cut-gaps"
+        d="M22,12 L222,12 Q234,12 234,24 L234,222 Q234,234 222,234 L22,234 Q12,234 12,222 L12,24 Q12,12 22,12 Z" />
     </svg>
     <div class="cut-scissors">✂️</div>
   </div>
