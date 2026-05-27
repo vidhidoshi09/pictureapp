@@ -336,6 +336,85 @@
       transition: transform var(--tx-base);
     }
     #save-btn:active { transform: scale(0.96); }
+
+    /* ═══════════════════════════════════════
+       DETAIL VIEW
+    ═══════════════════════════════════════ */
+    #detail-overlay {
+      background: var(--color-bg);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding:
+        calc(72px + env(safe-area-inset-top, 0px))
+        var(--sp-2xl)
+        calc(var(--sp-2xl) + env(safe-area-inset-bottom, 0px));
+      gap: 0;
+    }
+
+    .detail-img-wrap {
+      width: 78%; aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 32px;
+    }
+    .detail-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      filter:
+        drop-shadow( 2px  0px  0 #fff)
+        drop-shadow(-2px  0px  0 #fff)
+        drop-shadow( 0px  2px  0 #fff)
+        drop-shadow( 0px -2px  0 #fff)
+        drop-shadow(0 8px 28px rgba(0,0,0,0.13));
+    }
+
+    .detail-name {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: var(--fw-bold);
+      letter-spacing: -0.5px; color: var(--color-text-primary);
+      text-align: center; line-height: 1.15;
+      -webkit-text-stroke: 4px #fff;
+      paint-order: stroke fill;
+      margin-bottom: 8px;
+    }
+    .detail-date {
+      font-size: var(--fs-sm); color: var(--color-text-secondary);
+      text-align: center;
+    }
+
+    /* delete button */
+    .detail-delete {
+      margin-top: 40px;
+      width: 44px; height: 44px; border-radius: var(--r-full);
+      background: rgba(0,0,0,0.06); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--color-text-secondary);
+      transition: background var(--tx-base), color var(--tx-base);
+    }
+    .detail-delete:active { background: rgba(220,60,60,0.12); color: #c0392b; }
+
+    /* ═══════════════════════════════════════
+       EMPTY STATE
+    ═══════════════════════════════════════ */
+    .empty {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px;
+      padding: 60px 32px;
+      text-align: center;
+    }
+    .empty__icon { font-size: 52px; line-height: 1; margin-bottom: 4px; }
+    .empty__title {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: var(--fw-bold);
+      color: var(--color-text-primary);
+      -webkit-text-stroke: 3px #fff; paint-order: stroke fill;
+    }
+    .empty__sub {
+      font-size: var(--fs-sm); color: var(--color-text-secondary);
+      line-height: 1.5; max-width: 220px;
+    }
   </style>
 </head>
 <body>
@@ -400,6 +479,17 @@
   </div>
 </div>
 
+<!-- DETAIL VIEW ──────────────────────────── -->
+<div id="detail-overlay" class="overlay" role="dialog" aria-label="Object detail">
+  <button class="btn-close" id="detail-close" aria-label="Close">✕</button>
+  <div class="detail-img-wrap">
+    <img id="detail-img" src="" alt="" />
+  </div>
+  <p class="detail-name" id="detail-name"></p>
+  <p class="detail-date" id="detail-date"></p>
+  <button class="detail-delete" id="detail-delete" aria-label="Delete">🗑</button>
+</div>
+
 <canvas id="capture-canvas" style="display:none"></canvas>
 
 <script>
@@ -445,12 +535,22 @@ function getMemories() {
    RENDER GRID
 ════════════════════════════════════════════════ */
 function renderGrid() {
-  const memories = getMemories().slice().reverse(); // newest first
+  const memories = getMemories().slice().reverse();
   const grid = document.getElementById('grid');
 
   document.getElementById('header-date').textContent  = fmtShort(new Date());
   document.getElementById('header-count').textContent =
     `${memories.length} object${memories.length !== 1 ? 's' : ''} collected`;
+
+  if (memories.length === 0) {
+    grid.innerHTML = `
+      <div class="empty" style="grid-column:1/-1">
+        <div class="empty__icon">📦</div>
+        <p class="empty__title">Nothing here yet</p>
+        <p class="empty__sub">Tap + to capture your first object and start your collection</p>
+      </div>`;
+    return;
+  }
 
   grid.innerHTML = memories.map(m => `
     <div class="card" role="button" tabindex="0" aria-label="${esc(m.name)}" data-id="${m.id}">
@@ -461,10 +561,46 @@ function renderGrid() {
       <p class="card__date">${m.date}</p>
     </div>
   `).join('');
+
+  // Tap card → detail view
+  grid.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => openDetail(card.dataset.id));
+  });
 }
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════════════
+   DETAIL VIEW
+════════════════════════════════════════════════ */
+function openDetail(id) {
+  const memories = getMemories();
+  const m = memories.find(x => String(x.id) === String(id));
+  if (!m) return;
+
+  document.getElementById('detail-img').src   = m.image;
+  document.getElementById('detail-img').alt   = m.name;
+  document.getElementById('detail-name').textContent = m.name;
+  document.getElementById('detail-date').textContent = m.date;
+  document.getElementById('detail-delete').dataset.id = m.id;
+
+  showOverlay('detail-overlay');
+}
+
+function closeDetail() {
+  hideOverlay('detail-overlay');
+  document.getElementById('detail-img').src = '';
+}
+
+function deleteMemory(id) {
+  const stored = loadMemories();
+  // Don't delete seed items (they have id 1–4)
+  const updated = stored.filter(m => String(m.id) !== String(id));
+  saveMemories(updated);
+  closeDetail();
+  renderGrid();
 }
 
 /* ════════════════════════════════════════════════
@@ -478,7 +614,7 @@ function hideOverlay(id) {
   document.getElementById(id).classList.remove('active');
 }
 function hideAll() {
-  ['camera-overlay','processing-overlay','review-overlay'].forEach(hideOverlay);
+  ['camera-overlay','processing-overlay','review-overlay','detail-overlay'].forEach(hideOverlay);
   document.getElementById('fab').style.display = 'flex';
 }
 
@@ -533,7 +669,7 @@ function captureFrame() {
    STEP 2 — BACKGROUND REMOVAL via remove.bg API
    DEV_MODE: set true to skip API calls while testing UI
 ════════════════════════════════════════════════ */
-const DEV_SKIP_BG = true; // ← flip to false when ready to use credits
+const DEV_SKIP_BG = false; // ← flip to true to save credits while testing UI
 
 async function removeBackground(jpegDataURL) {
   // Skip API during UI development
@@ -677,6 +813,13 @@ document.getElementById('save-btn').addEventListener('click', saveMemory);
 // Enter key in name field saves
 document.getElementById('name-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); saveMemory(); }
+});
+
+// Detail view
+document.getElementById('detail-close').addEventListener('click', closeDetail);
+document.getElementById('detail-delete').addEventListener('click', e => {
+  const id = e.currentTarget.dataset.id;
+  if (confirm('Remove this memory?')) deleteMemory(id);
 });
 
 // Escape closes everything
