@@ -235,9 +235,11 @@
       filter: drop-shadow(0 0 5px rgba(245,167,66,0.7));
     }
     @keyframes grow-done {
-      0%   { stroke-dashoffset: 942; }
-      96%  { stroke-dashoffset: 0;   }
-      100% { stroke-dashoffset: 942; }
+      0%   { stroke-dashoffset: 942; opacity: 0; }
+      4%   { stroke-dashoffset: 942; opacity: 1; }
+      95%  { stroke-dashoffset: 0;   opacity: 1; }
+      99%  { stroke-dashoffset: 0;   opacity: 0; }
+      100% { stroke-dashoffset: 942; opacity: 0; }
     }
 
     /* Scissors — follows the line, same 2.8s */
@@ -526,16 +528,17 @@ const SEED = [
   { id:4, name:'Rubber Duck',  date:'May 13, 2026', image:'assets/duck.png' },
 ];
 
-function getMemories() {
-  const stored = loadMemories();
-  return stored.length ? stored : SEED;
+function initializeIfEmpty() {
+  if (loadMemories().length === 0) {
+    saveMemories(SEED);
+  }
 }
 
 /* ════════════════════════════════════════════════
    RENDER GRID
 ════════════════════════════════════════════════ */
 function renderGrid() {
-  const memories = getMemories().slice().reverse();
+  const memories = loadMemories().slice().reverse();
   const grid = document.getElementById('grid');
 
   document.getElementById('header-date').textContent  = fmtShort(new Date());
@@ -576,7 +579,7 @@ function esc(s) {
    DETAIL VIEW
 ════════════════════════════════════════════════ */
 function openDetail(id) {
-  const memories = getMemories();
+  const memories = loadMemories();
   const m = memories.find(x => String(x.id) === String(id));
   if (!m) return;
 
@@ -595,9 +598,7 @@ function closeDetail() {
 }
 
 function deleteMemory(id) {
-  const stored = loadMemories();
-  // Don't delete seed items (they have id 1–4)
-  const updated = stored.filter(m => String(m.id) !== String(id));
+  const updated = loadMemories().filter(m => String(m.id) !== String(id));
   saveMemories(updated);
   closeDetail();
   renderGrid();
@@ -744,7 +745,7 @@ async function saveMemory() {
 
   reader.onload = () => {
     const dataURL = reader.result;
-    const memories = loadMemories().length ? loadMemories() : SEED;
+    const memories = loadMemories();
     const newMemory = {
       id:    Date.now(),
       name:  name,
@@ -831,6 +832,7 @@ document.addEventListener('keydown', e => {
 /* ════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════ */
+initializeIfEmpty();
 renderGrid();
 </script>
 </body>
