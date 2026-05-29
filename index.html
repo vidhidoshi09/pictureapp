@@ -308,6 +308,29 @@
     #name-input::placeholder { color: var(--color-text-tertiary); }
     #name-input:focus { border-bottom-color: var(--color-accent); }
 
+    /* ── Review screen entrance animations ──────────────────────── */
+    @keyframes object-arrive {
+      from { transform: scale(0.82) translateY(20px); opacity: 0; }
+      to   { transform: scale(1)    translateY(0);    opacity: 1; }
+    }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+
+    /* Object springs in — slightly overshoots then settles */
+    #review-overlay.active .review-img-wrap {
+      animation: object-arrive 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    /* Name input fades up 250ms after object arrives */
+    #review-overlay.active #name-input {
+      animation: fade-up 0.3s ease 0.25s both;
+    }
+    /* Buttons fade up 100ms after input */
+    #review-overlay.active .review-actions {
+      animation: fade-up 0.3s ease 0.35s both;
+    }
+
     /* Action buttons row */
     .review-actions {
       display: flex; align-items: center; justify-content: center;
@@ -632,27 +655,29 @@ async function saveMemory() {
 async function onShutterPressed() {
   if (!stream) return;
 
-  // 1. Capture frame from video
   const jpegDataURL = captureFrame();
   stopCamera();
   hideOverlay('camera-overlay');
 
-  // 2. Show processing overlay — set photo as cut-stage preview
   document.getElementById('proc-preview').src = jpegDataURL;
   showOverlay('processing-overlay');
 
-  try {
-    // 3. Remove background in browser
-    const blob = await removeBackground(jpegDataURL);
+  // Let the scissors animation play for at least one full loop (2.8s)
+  // When the real bg-removal API is enabled, it waits for whichever takes longer
+  const MIN_MS = 2800;
+  const t0 = Date.now();
 
-    // 4. Show review screen
+  try {
+    const blob = await removeBackground(jpegDataURL);
+    const remaining = MIN_MS - (Date.now() - t0);
+    if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
     showReview(blob);
   } catch (err) {
-    console.error('[mediapipe]', err.message || err);
-    alert(`⚠️ Background removal failed (${err.message || 'unknown error'})\n\nShowing original image. Check console for details.`);
-    // Fallback: convert original JPEG to blob and show
+    console.error('[bg-removal]', err.message || err);
     const res = await fetch(jpegDataURL);
     const fallbackBlob = await res.blob();
+    const remaining = MIN_MS - (Date.now() - t0);
+    if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
     showReview(fallbackBlob);
   }
 }
