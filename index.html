@@ -3,56 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#edecea" />
+  <meta name="theme-color" content="#F6F6F6" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>Memories</title>
+  <title>collectobjects</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;800&display=swap" rel="stylesheet" />
+  <script type="importmap">
+  {
+    "imports": {
+      "@imgly/background-removal": "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/background-removal.js"
+    }
+  }
+  </script>
   <style>
-    /* ── Tokens ──────────────────────────────────────────────────── */
+    /* ── Tokens ─────────────────────────────────────────────────── */
     :root {
-      --color-bg:             #edecea;
-      --color-dot:            #ccc8c2;
-      --color-text-primary:   #111111;
-      --color-text-secondary: #888888;
-      --color-text-tertiary:  #bbbbbb;
-      --color-accent:         #f5a742;
-      --color-camera-bg:      #000000;
+      --neutral-0:    #FFFFFF;
+      --neutral-50:   #F6F6F6;
+      --neutral-100:  #E2E2E2;
+      --neutral-200:  #D4D4D4;
+      --neutral-300:  #C0C0C0;
+      --neutral-400:  #B4B4B4;
+      --neutral-500:  #A1A1A1;
+      --neutral-600:  #939393;
+      --neutral-700:  #727272;
+      --neutral-800:  #595959;
+      --neutral-900:  #444444;
+      --neutral-1000: #141414;
 
-      --font:         -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-display: 'Nunito Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --fs-xs: 11px; --fs-sm: 13px; --fs-base: 14px; --fs-md: 15px; --fs-xl: 28px;
-      --fw-reg: 400; --fw-semi: 700; --fw-bold: 900;
+      --orange-accent:      #f5a742;
+      --orange-accent-dark: #e8962e;
+      --orange-accent-glow: rgba(245,167,66,0.30);
 
-      --sp-sm: 8px; --sp-md: 12px; --sp-lg: 16px;
-      --sp-xl: 20px; --sp-2xl: 24px; --sp-3xl: 32px;
+      --color-bg:             var(--neutral-50);
+      --color-dot:            var(--neutral-100);
+      --color-surface:        var(--neutral-100);
+      --color-white:          var(--neutral-0);
+      --color-text-primary:   var(--neutral-1000);
+      --color-text-secondary: var(--neutral-600);
+      --color-text-tertiary:  var(--neutral-400);
+      --color-accent:         var(--orange-accent);
+      --color-accent-dark:    var(--orange-accent-dark);
+      --color-accent-glow:    var(--orange-accent-glow);
+      --color-camera-bg:      var(--neutral-1000);
+      --color-border:         var(--neutral-200);
+      --color-border-subtle:  var(--neutral-100);
 
-      --r-md: 20px; --r-full: 50%;
-      --sh-object: drop-shadow(0 6px 18px rgba(0,0,0,0.14));
-      --sh-fab: 0 6px 20px rgba(245,167,66,0.35);
+      --font-ui:     -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      --font-object: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      --fs-xs:   11px;
+      --fs-sm:   13px;
+      --fs-base: 14px;
+      --fs-md:   15px;
+      --fs-lg:   18px;
+      --fs-xl:   22px;
+      --fs-2xl:  28px;
+
+      --fw-reg:   400;
+      --fw-med:   500;
+      --fw-semi:  600;
+      --fw-bold:  700;
+      --fw-black: 800;
+
+      --sp-xs:  4px;
+      --sp-sm:  8px;
+      --sp-md:  12px;
+      --sp-lg:  16px;
+      --sp-xl:  20px;
+      --sp-2xl: 24px;
+      --sp-3xl: 32px;
+      --sp-4xl: 48px;
+
+      --r-sm:   12px;
+      --r-md:   20px;
+      --r-pill: 100px;
+      --r-full: 50%;
+
+      --sh-object:    drop-shadow(0 6px 18px rgba(0,0,0,0.14));
+      --sh-object-lg: drop-shadow(0 8px 22px rgba(0,0,0,0.16));
+      --sh-fab:       0 6px 20px rgba(245,167,66,0.35);
+      --sh-close:     0 1px 6px rgba(0,0,0,0.12);
+
+      --tx-fast: 0.15s ease;
       --tx-base: 0.2s ease;
+      --tx-slow: 0.3s ease;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { height: 100%; }
 
     body {
-      font-family: var(--font);
+      font-family: var(--font-ui);
       background-color: var(--color-bg);
       color: var(--color-text-primary);
       overflow: hidden;
       max-width: 430px;
       margin: 0 auto;
       position: relative;
-    }
-
-    #dots {
-      position: fixed; inset: 0; z-index: 0;
-      background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
-      background-size: 28px 28px;
-      pointer-events: none;
     }
 
     /* ═══════════════════════════════════════
@@ -68,27 +118,51 @@
         calc(var(--sp-lg)  + env(safe-area-inset-right,  0px))
         calc(90px          + env(safe-area-inset-bottom, 0px))
         calc(var(--sp-lg)  + env(safe-area-inset-left,   0px));
+      background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
+      background-size: 28px 28px;
     }
 
     .header { margin-bottom: var(--sp-3xl); }
-    .header__date  { font-size: var(--fs-sm); color: var(--color-text-secondary); margin-bottom: 4px; }
-    .header__title { font-size: var(--fs-xl); font-weight: var(--fw-reg); letter-spacing: -0.5px; line-height: 1.15; }
-    .header__count { font-size: var(--fs-sm); color: var(--color-text-secondary); margin-top: 4px; }
+    .header__title {
+      font-family: var(--font-ui);
+      font-size: var(--fs-2xl);
+      font-weight: var(--fw-black);
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+    }
+    .header__count {
+      font-size: var(--fs-sm);
+      color: var(--color-text-secondary);
+      margin-top: 4px;
+    }
 
-    .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--sp-lg); row-gap: var(--sp-3xl); }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--sp-lg);
+      row-gap: var(--sp-2xl);
+    }
 
-    .card { cursor: pointer; user-select: none; transition: transform var(--tx-base); display: flex; flex-direction: column; align-items: center; }
+    .card {
+      cursor: pointer; user-select: none;
+      transition: transform var(--tx-base);
+      display: flex; flex-direction: column; align-items: center;
+    }
     .card:active { transform: scale(0.97); }
 
-    .card__img-wrap { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+    .card__img-wrap {
+      width: 100%; aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
     .card__img-wrap img {
-      width: 90%; height: 90%; object-fit: contain; mix-blend-mode: multiply;
-      /* Soft white outline around object — sticker effect */
+      width: 90%; height: 90%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
       filter:
-        drop-shadow( 2px  0px  0 #fff)
-        drop-shadow(-2px  0px  0 #fff)
-        drop-shadow( 0px  2px  0 #fff)
-        drop-shadow( 0px -2px  0 #fff)
+        drop-shadow( 2px  0   0 #fff)
+        drop-shadow(-2px  0   0 #fff)
+        drop-shadow( 0    2px 0 #fff)
+        drop-shadow( 0   -2px 0 #fff)
         drop-shadow( 1.5px  1.5px 0 #fff)
         drop-shadow(-1.5px  1.5px 0 #fff)
         drop-shadow( 1.5px -1.5px 0 #fff)
@@ -97,14 +171,21 @@
     }
 
     .card__name {
-      font-family: var(--font-display); font-size: var(--fs-md); font-weight: var(--fw-bold);
-      letter-spacing: -0.2px; color: var(--color-text-primary);
-      text-align: center; margin-top: var(--sp-sm); line-height: 1.2;
-      /* Thick white stroke — sticker/CapWords style */
-      -webkit-text-stroke: 4px #fff;
-      paint-order: stroke fill;
+      font-family: var(--font-object);
+      font-size: var(--fs-md);
+      font-weight: var(--fw-bold);
+      letter-spacing: -0.2px;
+      color: var(--color-text-primary);
+      text-align: center;
+      margin-top: var(--sp-sm);
+      line-height: 1.2;
     }
-    .card__date  { font-size: var(--fs-xs); color: var(--color-text-tertiary); text-align: center; margin-top: 4px; }
+    .card__date {
+      font-size: var(--fs-xs);
+      color: var(--color-text-tertiary);
+      text-align: center;
+      margin-top: 4px;
+    }
 
     /* FAB */
     #fab {
@@ -115,8 +196,7 @@
       background: var(--color-accent); box-shadow: var(--sh-fab);
       border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 26px; font-weight: var(--fw-semi); color: #fff;
-      z-index: 50; transition: transform var(--tx-base); user-select: none;
+      z-index: 50; transition: transform var(--tx-fast); user-select: none;
     }
     #fab:active { transform: scale(0.95); }
 
@@ -132,16 +212,16 @@
     }
     .overlay.active { display: flex; }
 
-    /* Close / back button */
     .btn-close {
       position: absolute;
       top: calc(16px + env(safe-area-inset-top, 0px));
       left: 16px;
-      width: 40px; height: 40px; border-radius: var(--r-full);
-      background: rgba(0,0,0,0.45); border: none; cursor: pointer;
+      width: 44px; height: 44px; border-radius: var(--r-full);
+      background: rgba(255,255,255,0.92);
+      box-shadow: var(--sh-close);
+      border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: #fff; z-index: 10;
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      font-size: 18px; color: var(--neutral-800); z-index: 10;
     }
 
     /* ═══════════════════════════════════════
@@ -157,7 +237,8 @@
     .cam-denied {
       display: none; flex: 1; flex-direction: column;
       align-items: center; justify-content: center;
-      color: #666; font-size: var(--fs-sm); text-align: center; padding: 32px; gap: 12px;
+      color: var(--neutral-600); font-size: var(--fs-sm);
+      text-align: center; padding: 32px; gap: 12px;
     }
     .cam-denied.visible { display: flex; }
     .cam-denied span:first-child { font-size: 40px; }
@@ -178,24 +259,23 @@
     #shutter-btn:active { transform: scale(0.91); background: #ccc; }
 
     /* ═══════════════════════════════════════
-       STEP 2 — SCISSORS CUT ANIMATION
+       STEP 2 — PROCESSING
     ═══════════════════════════════════════ */
     #processing-overlay {
       background: var(--color-bg);
+      background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
+      background-size: 28px 28px;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 28px;
     }
 
-    /* Image preview with scissors cutting around it */
     .cut-stage {
       position: relative;
-      width: 240px;
-      height: 240px;
+      width: 240px; height: 240px;
     }
 
-    /* The photo being "cut" */
     .cut-stage__img {
       width: 100%; height: 100%;
       object-fit: cover;
@@ -203,7 +283,6 @@
       display: block;
     }
 
-    /* SVG overlay */
     .cut-stage__svg {
       position: absolute;
       inset: -12px;
@@ -212,7 +291,6 @@
       overflow: visible;
     }
 
-    /* Layer 1 — full dashed line always visible from the start */
     .cut-trace {
       fill: none;
       stroke: var(--color-accent);
@@ -223,7 +301,6 @@
       filter: drop-shadow(0 0 3px rgba(245,167,66,0.4));
     }
 
-    /* Layer 2 — bright solid segment that lights up where scissors has been */
     .cut-done {
       fill: none;
       stroke: var(--color-accent);
@@ -240,7 +317,6 @@
       100% { stroke-dashoffset: 942; }
     }
 
-    /* Scissors — follows the line, same 2.8s */
     .cut-scissors {
       position: absolute;
       font-size: 22px;
@@ -256,20 +332,25 @@
     }
 
     .processing-label {
-      font-family: var(--font-display);
-      font-size: var(--fs-md); font-weight: var(--fw-bold);
+      font-family: var(--font-ui);
+      font-size: var(--fs-md);
+      font-weight: var(--fw-semi);
       color: var(--color-text-primary);
     }
     .processing-sub {
-      font-size: var(--fs-sm); color: var(--color-text-secondary); text-align: center;
+      font-size: var(--fs-sm);
+      color: var(--color-text-secondary);
+      text-align: center;
       margin-top: -16px;
     }
 
     /* ═══════════════════════════════════════
-       STEP 3 — REVIEW (name + confirm)
+       STEP 3 — REVIEW
     ═══════════════════════════════════════ */
     #review-overlay {
       background: var(--color-bg);
+      background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
+      background-size: 28px 28px;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -280,7 +361,6 @@
       gap: 0;
     }
 
-    /* Object preview — floats on grey, no container */
     .review-img-wrap {
       width: 72%; aspect-ratio: 1;
       display: flex; align-items: center; justify-content: center;
@@ -293,14 +373,15 @@
       mix-blend-mode: multiply;
     }
 
-    /* Name input */
     #name-input {
       width: 100%;
-      font-family: var(--font-display);
-      font-size: 22px; font-weight: var(--fw-bold);
-      text-align: center; color: var(--color-text-primary);
+      font-family: var(--font-ui);
+      font-size: var(--fs-xl);
+      font-weight: var(--fw-semi);
+      text-align: center;
+      color: var(--color-text-primary);
       background: transparent; border: none;
-      border-bottom: 2px solid rgba(0,0,0,0.1);
+      border-bottom: 2px solid var(--color-border-subtle);
       padding: 8px 4px 10px;
       outline: none;
       margin-bottom: var(--sp-3xl);
@@ -308,7 +389,7 @@
     #name-input::placeholder { color: var(--color-text-tertiary); }
     #name-input:focus { border-bottom-color: var(--color-accent); }
 
-    /* ── Review screen entrance animations ──────────────────────── */
+    /* Entrance animations */
     @keyframes object-arrive {
       from { transform: scale(0.82) translateY(20px); opacity: 0; }
       to   { transform: scale(1)    translateY(0);    opacity: 1; }
@@ -318,64 +399,191 @@
       to   { opacity: 1; transform: translateY(0);   }
     }
 
-    /* Object springs in — slightly overshoots then settles */
     #review-overlay.active .review-img-wrap {
       animation: object-arrive 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
     }
-    /* Name input fades up 250ms after object arrives */
     #review-overlay.active #name-input {
       animation: fade-up 0.3s ease 0.25s both;
     }
-    /* Buttons fade up 100ms after input */
     #review-overlay.active .review-actions {
       animation: fade-up 0.3s ease 0.35s both;
     }
 
-    /* Action buttons row */
+    /* Three-button review row */
     .review-actions {
       display: flex; align-items: center; justify-content: center;
-      gap: var(--sp-xl); width: 100%;
+      gap: var(--sp-2xl); width: 100%;
     }
 
-    /* Retake — grey circle */
-    #retake-btn {
-      width: 52px; height: 52px; border-radius: var(--r-full);
-      background: #e2dfdb; border: none; cursor: pointer;
+    .review-btn {
+      border: none; cursor: pointer; border-radius: var(--r-full);
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      transition: transform var(--tx-base);
+      transition: transform var(--tx-fast);
+      background: var(--neutral-100);
+      width: 56px; height: 56px;
+      font-size: 20px; color: var(--neutral-800);
     }
-    #retake-btn:active { transform: scale(0.94); }
+    .review-btn:active { transform: scale(0.95); }
 
-    /* Save — orange pill */
-    #save-btn {
-      flex: 1; max-width: 200px;
-      height: 52px; border-radius: 26px;
-      background: var(--color-accent); border: none; cursor: pointer;
-      font-family: var(--font-display);
-      font-size: var(--fs-base); font-weight: var(--fw-bold);
-      color: #fff; letter-spacing: 0.3px;
+    #confirm-btn {
+      width: 64px; height: 64px;
+      background: var(--color-accent);
+      font-size: 24px; color: #fff;
       box-shadow: var(--sh-fab);
-      transition: transform var(--tx-base);
     }
-    #save-btn:active { transform: scale(0.96); }
+    #confirm-btn:active { transform: scale(0.93); }
+
+    /* ═══════════════════════════════════════
+       DETAIL VIEW
+    ═══════════════════════════════════════ */
+    #detail-overlay {
+      background: var(--color-bg);
+      background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
+      background-size: 28px 28px;
+      flex-direction: column;
+      align-items: center;
+      padding:
+        calc(72px + env(safe-area-inset-top, 0px))
+        var(--sp-2xl)
+        calc(var(--sp-2xl) + env(safe-area-inset-bottom, 0px));
+    }
+
+    .detail-img-wrap {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-img-wrap img {
+      max-width: 78%;
+      max-height: 60vh;
+      object-fit: contain;
+      filter:
+        drop-shadow( 2px  0   0 #fff)
+        drop-shadow(-2px  0   0 #fff)
+        drop-shadow( 0    2px 0 #fff)
+        drop-shadow( 0   -2px 0 #fff)
+        drop-shadow( 1.5px  1.5px 0 #fff)
+        drop-shadow(-1.5px  1.5px 0 #fff)
+        drop-shadow( 1.5px -1.5px 0 #fff)
+        drop-shadow(-1.5px -1.5px 0 #fff)
+        drop-shadow(0 8px 24px rgba(0,0,0,0.14));
+      mix-blend-mode: multiply;
+    }
+
+    .detail-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-top: var(--sp-xl);
+      margin-bottom: var(--sp-3xl);
+      width: 100%;
+    }
+
+    #detail-name {
+      font-family: var(--font-object);
+      font-size: var(--fs-xl);
+      font-weight: var(--fw-bold);
+      color: var(--color-text-primary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: var(--r-sm);
+      letter-spacing: -0.3px;
+      text-align: center;
+      line-height: 1.2;
+      transition: background var(--tx-fast);
+    }
+    #detail-name:active { background: var(--color-border-subtle); }
+
+    .detail-name-input {
+      font-family: var(--font-object);
+      font-size: var(--fs-xl);
+      font-weight: var(--fw-bold);
+      color: var(--color-text-primary);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--color-accent);
+      text-align: center;
+      padding: 4px 8px;
+      outline: none;
+      max-width: 80%;
+      letter-spacing: -0.3px;
+    }
+
+    #detail-date {
+      font-size: var(--fs-xs);
+      color: var(--color-text-tertiary);
+      text-align: center;
+    }
+
+    .detail-footer {
+      display: flex;
+      justify-content: center;
+    }
+
+    #delete-btn {
+      font-family: var(--font-ui);
+      font-size: var(--fs-sm);
+      font-weight: var(--fw-med);
+      color: var(--neutral-500);
+      background: transparent;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--r-pill);
+      padding: 0 var(--sp-2xl);
+      height: 40px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background var(--tx-base), color var(--tx-base), border-color var(--tx-base);
+    }
+    #delete-btn.confirming {
+      background: #e53e3e;
+      border-color: #e53e3e;
+      color: #fff;
+    }
+
+    /* Detail entrance animations */
+    #detail-overlay.active .detail-img-wrap {
+      animation: object-arrive 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    #detail-overlay.active .detail-info {
+      animation: fade-up 0.3s ease 0.15s both;
+    }
+    #detail-overlay.active .detail-footer {
+      animation: fade-up 0.3s ease 0.22s both;
+    }
+
+    /* Privacy note */
+    .privacy-note {
+      font-size: var(--fs-xs);
+      color: var(--color-text-tertiary);
+      text-align: center;
+      margin-top: var(--sp-3xl);
+    }
   </style>
 </head>
 <body>
 
-<div id="dots" aria-hidden="true"></div>
-
 <!-- HOME ─────────────────────────────────── -->
 <main id="home">
   <header class="header">
-    <p class="header__date" id="header-date"></p>
-    <h1 class="header__title">Memories</h1>
+    <h1 class="header__title">collectobjects</h1>
     <p class="header__count" id="header-count"></p>
   </header>
-  <section class="grid" id="grid" aria-label="Memory collection"></section>
+  <section class="grid" id="grid" aria-label="Object collection"></section>
+  <p class="privacy-note">Stays on your phone — no accounts, no cloud.</p>
 </main>
 
-<button id="fab" aria-label="Capture new object">+</button>
+<button id="fab" aria-label="Capture new object">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 15.2C13.7673 15.2 15.2 13.7673 15.2 12C15.2 10.2327 13.7673 8.8 12 8.8C10.2327 8.8 8.8 10.2327 8.8 12C8.8 13.7673 10.2327 15.2 12 15.2Z" fill="white"/>
+    <path d="M9 2L7.17 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4H16.83L15 2H9ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17Z" fill="white"/>
+  </svg>
+</button>
 
 <!-- STEP 1 — CAMERA ──────────────────────── -->
 <div id="camera-overlay" class="overlay" role="dialog" aria-label="Camera">
@@ -395,10 +603,8 @@
   <div class="cut-stage">
     <img id="proc-preview" class="cut-stage__img" src="" alt="" />
     <svg class="cut-stage__svg" viewBox="0 0 246 246" xmlns="http://www.w3.org/2000/svg">
-      <!-- faint dashed guide — full line visible from start, scissors follows it -->
       <path class="cut-trace"
         d="M22,12 L222,12 Q234,12 234,24 L234,222 Q234,234 222,234 L22,234 Q12,234 12,222 L12,24 Q12,12 22,12 Z" />
-      <!-- bright solid segment lights up where scissors has already cut -->
       <path class="cut-done"
         d="M22,12 L222,12 Q234,12 234,24 L234,222 Q234,234 222,234 L22,234 Q12,234 12,222 L12,24 Q12,12 22,12 Z" />
     </svg>
@@ -418,15 +624,31 @@
          maxlength="40" autocomplete="off" autocorrect="off"
          autocapitalize="words" spellcheck="false" />
   <div class="review-actions">
-    <button id="retake-btn" aria-label="Retake photo">↺</button>
-    <button id="save-btn">Save to Memories</button>
+    <button class="review-btn" id="retake-btn" aria-label="Retake">↺</button>
+    <button class="review-btn" id="confirm-btn" aria-label="Save">✓</button>
+    <button class="review-btn" id="discard-btn" aria-label="Discard">✕</button>
+  </div>
+</div>
+
+<!-- DETAIL VIEW ──────────────────────── -->
+<div id="detail-overlay" class="overlay" role="dialog" aria-label="Object detail">
+  <button class="btn-close" id="detail-close" aria-label="Close">✕</button>
+  <div class="detail-img-wrap">
+    <img id="detail-img" src="" alt="" />
+  </div>
+  <div class="detail-info">
+    <button class="detail-name" id="detail-name"></button>
+    <p class="detail-date" id="detail-date"></p>
+  </div>
+  <div class="detail-footer">
+    <button id="delete-btn">Delete</button>
   </div>
 </div>
 
 <canvas id="capture-canvas" style="display:none"></canvas>
 
-<script>
-'use strict';
+<script type="module">
+import { removeBackground as imglyRemoveBg } from '@imgly/background-removal';
 
 /* ════════════════════════════════════════════════
    STORAGE
@@ -446,36 +668,37 @@ function saveMemories(arr) {
 /* ════════════════════════════════════════════════
    DATE HELPERS
 ════════════════════════════════════════════════ */
-const fmtShort = d => d.toLocaleDateString('en-US', { month:'long', day:'numeric' });
-const fmtFull  = d => d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+const fmtFull = d => d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
 
 /* ════════════════════════════════════════════════
-   SEED DATA (shown on first visit)
+   SEED DATA
 ════════════════════════════════════════════════ */
-const SEED = [
-  { id:1, name:'Vintage Key',  date:'May 21, 2026', image:'assets/key.png' },
-  { id:2, name:'Blue Teapot',  date:'May 19, 2026', image:'assets/teapot.png' },
-  { id:3, name:'Croissant',    date:'May 16, 2026', image:'assets/croissant.png' },
-  { id:4, name:'Rubber Duck',  date:'May 13, 2026', image:'assets/duck.png' },
-];
+function buildSeed() {
+  const daysAgo = n => { const d = new Date(); d.setDate(d.getDate()-n); return fmtFull(d); };
+  return [
+    { id:1, name:'Vintage Key',  date:daysAgo(8),  image:'assets/key.png' },
+    { id:2, name:'Blue Teapot',  date:daysAgo(10), image:'assets/teapot.png' },
+    { id:3, name:'Croissant',    date:daysAgo(13), image:'assets/croissant.png' },
+    { id:4, name:'Rubber Duck',  date:daysAgo(16), image:'assets/duck.png' },
+  ];
+}
 
 function getMemories() {
   const stored = loadMemories();
-  return stored.length ? stored : SEED;
+  return stored.length ? stored : buildSeed();
 }
 
 /* ════════════════════════════════════════════════
    RENDER GRID
 ════════════════════════════════════════════════ */
 function renderGrid() {
-  const memories = getMemories().slice().reverse(); // newest first
-  const grid = document.getElementById('grid');
+  const memories = getMemories().slice().reverse();
+  const count = memories.length;
 
-  document.getElementById('header-date').textContent  = fmtShort(new Date());
   document.getElementById('header-count').textContent =
-    `${memories.length} object${memories.length !== 1 ? 's' : ''} collected`;
+    `${count} object${count !== 1 ? 's' : ''}`;
 
-  grid.innerHTML = memories.map(m => `
+  document.getElementById('grid').innerHTML = memories.map(m => `
     <div class="card" role="button" tabindex="0" aria-label="${esc(m.name)}" data-id="${m.id}">
       <div class="card__img-wrap">
         <img src="${m.image}" alt="${esc(m.name)}" loading="lazy" decoding="async" />
@@ -501,7 +724,7 @@ function hideOverlay(id) {
   document.getElementById(id).classList.remove('active');
 }
 function hideAll() {
-  ['camera-overlay','processing-overlay','review-overlay'].forEach(hideOverlay);
+  ['camera-overlay','processing-overlay','review-overlay','detail-overlay'].forEach(hideOverlay);
   document.getElementById('fab').style.display = 'flex';
 }
 
@@ -544,7 +767,6 @@ function captureFrame() {
   const side = Math.min(vw, vh);
   canvas.width = canvas.height = 1024;
   const ctx = canvas.getContext('2d');
-  // Mirror horizontally to match the flipped preview
   ctx.save();
   ctx.scale(-1, 1);
   ctx.drawImage(video, (vw-side)/2, (vh-side)/2, side, side, -1024, 0, 1024, 1024);
@@ -553,100 +775,71 @@ function captureFrame() {
 }
 
 /* ════════════════════════════════════════════════
-   STEP 2 — BACKGROUND REMOVAL via remove.bg API
-   DEV_MODE: set true to skip API calls while testing UI
+   STEP 2 — BACKGROUND REMOVAL
+   Client-side ML via @imgly/background-removal.
+   Runs in browser, no API key, photos never leave
+   device. First use downloads model (~20MB, cached).
 ════════════════════════════════════════════════ */
-const DEV_SKIP_BG = true; // ← flip to false when ready to use credits
+let _bgModelReady = false;
 
 async function removeBackground(jpegDataURL) {
-  // Skip API during UI development
-  if (DEV_SKIP_BG) {
-    const res = await fetch(jpegDataURL);
-    return res.blob();
+  if (!_bgModelReady) {
+    document.querySelector('.processing-sub').textContent = 'Downloading cutout engine…';
   }
 
-  // Convert data URL → Blob
-  const res  = await fetch(jpegDataURL);
+  const res = await fetch(jpegDataURL);
   const blob = await res.blob();
 
-  // Build multipart form for remove.bg
-  const form = new FormData();
-  form.append('image_file', blob, 'photo.jpg');
-  form.append('size', 'auto');
-
-  console.log('[removebg] Sending to API...');
-
-  const response = await fetch('https://api.remove.bg/v1.0/removebg', {
-    method: 'POST',
-    headers: { 'X-Api-Key': 'mkvyD4Lt9VciJAMLPwUip9Ws' },
-    body: form,
+  const result = await imglyRemoveBg(blob, {
+    publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/',
   });
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err?.errors?.[0]?.title || `remove.bg ${response.status}`);
-  }
-
-  console.log('[removebg] Done');
-  return response.blob(); // PNG with transparent background
+  _bgModelReady = true;
+  document.querySelector('.processing-sub').textContent = 'Just a moment';
+  return result;
 }
 
 /* ════════════════════════════════════════════════
    STEP 3 — REVIEW
 ════════════════════════════════════════════════ */
-let _pendingBlob = null;  // Blob for the bg-removed image
+let _pendingBlob = null;
 
 function showReview(blob) {
-  // Revoke previous to avoid memory leaks
-  if (_pendingBlob && _pendingBlob !== blob) {
-    if (_pendingBlob instanceof Blob) {
-      const url = document.getElementById('review-img').src;
-      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-    }
+  if (_pendingBlob instanceof Blob) {
+    const url = document.getElementById('review-img').src;
+    if (url.startsWith('blob:')) URL.revokeObjectURL(url);
   }
   _pendingBlob = blob;
 
-  const objectURL = URL.createObjectURL(blob);
-  document.getElementById('review-img').src = objectURL;
+  document.getElementById('review-img').src = URL.createObjectURL(blob);
   document.getElementById('name-input').value = '';
-  document.getElementById('name-input').placeholder = 'Name this object…';
 
   hideOverlay('processing-overlay');
   showOverlay('review-overlay');
-
-  // Auto-focus name input after short delay
-  setTimeout(() => document.getElementById('name-input').focus(), 300);
 }
 
 /* ════════════════════════════════════════════════
-   STEP 4 — SAVE TO LOCALSTORAGE
+   STEP 4 — SAVE
 ════════════════════════════════════════════════ */
 async function saveMemory() {
   const name = document.getElementById('name-input').value.trim() || 'My Object';
-  const blob = _pendingBlob;
-  if (!blob) return;
+  if (!_pendingBlob) return;
 
-  // Convert blob → base64 data URL for persistent storage
   const reader = new FileReader();
-
   reader.onload = () => {
-    const dataURL = reader.result;
-    const memories = loadMemories().length ? loadMemories() : SEED;
-    const newMemory = {
+    const memories = getMemories();
+    memories.push({
       id:    Date.now(),
       name:  name,
       date:  fmtFull(new Date()),
-      image: dataURL,
-    };
-    memories.push(newMemory);
+      image: reader.result,
+    });
     saveMemories(memories);
-
     _pendingBlob = null;
-
     hideAll();
     renderGrid();
   };
-  reader.readAsDataURL(blob);
+  reader.readAsDataURL(_pendingBlob);
 }
 
 /* ════════════════════════════════════════════════
@@ -662,8 +855,8 @@ async function onShutterPressed() {
   document.getElementById('proc-preview').src = jpegDataURL;
   showOverlay('processing-overlay');
 
-  // Let the scissors animation play for at least one full loop (2.8s)
-  // When the real bg-removal API is enabled, it waits for whichever takes longer
+  // Minimum display time so the scissors completes one full loop.
+  // With real bg-removal, waits for whichever takes longer.
   const MIN_MS = 2800;
   const t0 = Date.now();
 
@@ -690,25 +883,147 @@ document.getElementById('camera-close').addEventListener('click', () => { stopCa
 document.getElementById('shutter-btn').addEventListener('click', onShutterPressed);
 document.getElementById('review-close').addEventListener('click', hideAll);
 
-// Retake: go back to camera
 document.getElementById('retake-btn').addEventListener('click', () => {
   hideOverlay('review-overlay');
   openCamera();
 });
 
-// Save
-document.getElementById('save-btn').addEventListener('click', saveMemory);
+document.getElementById('confirm-btn').addEventListener('click', saveMemory);
+document.getElementById('discard-btn').addEventListener('click', hideAll);
 
-// Enter key in name field saves
 document.getElementById('name-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); saveMemory(); }
 });
 
-// Escape closes everything
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { stopCamera(); hideAll(); }
 });
 
+/* ════════════════════════════════════════════════
+   DETAIL VIEW
+════════════════════════════════════════════════ */
+let _detailId = null;
+let _deleteTimer = null;
+
+function openDetail(idStr) {
+  const memories = getMemories();
+  const mem = memories.find(m => String(m.id) === String(idStr));
+  if (!mem) return;
+
+  _detailId = idStr;
+
+  const img = document.getElementById('detail-img');
+  img.src = mem.image;
+  img.alt = mem.name;
+
+  const nameBtn = document.getElementById('detail-name');
+  nameBtn.textContent = mem.name;
+  nameBtn.style.display = '';
+
+  const existingInput = document.getElementById('detail-name-input');
+  if (existingInput) existingInput.remove();
+
+  document.getElementById('detail-date').textContent = mem.date;
+  resetDeleteBtn();
+  showOverlay('detail-overlay');
+}
+
+function resetDeleteBtn() {
+  const btn = document.getElementById('delete-btn');
+  btn.classList.remove('confirming');
+  btn.textContent = 'Delete';
+  if (_deleteTimer) { clearTimeout(_deleteTimer); _deleteTimer = null; }
+}
+
+function startRename() {
+  const nameBtn = document.getElementById('detail-name');
+  const currentName = nameBtn.textContent;
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'detail-name-input';
+  input.id = 'detail-name-input';
+  input.value = currentName;
+  input.maxLength = 40;
+  input.setAttribute('autocomplete', 'off');
+  input.setAttribute('autocorrect', 'off');
+  input.setAttribute('autocapitalize', 'words');
+  input.setAttribute('spellcheck', 'false');
+
+  nameBtn.style.display = 'none';
+  nameBtn.parentNode.insertBefore(input, nameBtn);
+  input.focus();
+  input.select();
+
+  let committed = false;
+
+  function commit() {
+    if (committed) return;
+    committed = true;
+    const newName = input.value.trim() || currentName;
+    const memories = getMemories();
+    const idx = memories.findIndex(m => String(m.id) === String(_detailId));
+    if (idx !== -1) {
+      memories[idx].name = newName;
+      saveMemories(memories);
+    }
+    nameBtn.textContent = newName;
+    nameBtn.style.display = '';
+    input.remove();
+    renderGrid();
+  }
+
+  function cancel() {
+    committed = true;
+    nameBtn.style.display = '';
+    input.remove();
+  }
+
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); commit(); }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      input.removeEventListener('blur', commit);
+      cancel();
+    }
+  });
+}
+
+document.getElementById('detail-close').addEventListener('click', () => {
+  resetDeleteBtn();
+  hideAll();
+});
+
+document.getElementById('detail-name').addEventListener('click', startRename);
+
+document.getElementById('delete-btn').addEventListener('click', () => {
+  const btn = document.getElementById('delete-btn');
+  if (!btn.classList.contains('confirming')) {
+    btn.classList.add('confirming');
+    btn.textContent = 'Sure? Tap to delete';
+    _deleteTimer = setTimeout(resetDeleteBtn, 3000);
+  } else {
+    clearTimeout(_deleteTimer);
+    _deleteTimer = null;
+    const remaining = getMemories().filter(m => String(m.id) !== String(_detailId));
+    saveMemories(remaining);
+    hideAll();
+    renderGrid();
+  }
+});
+
+document.getElementById('grid').addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if (card) openDetail(card.dataset.id);
+});
+
+document.getElementById('grid').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    const card = e.target.closest('.card');
+    if (card) { e.preventDefault(); openDetail(card.dataset.id); }
+  }
+});
 
 /* ════════════════════════════════════════════════
    INIT
