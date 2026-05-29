@@ -406,18 +406,44 @@
 'use strict';
 
 /* ════════════════════════════════════════════════
-   STORAGE
+   INDEXEDDB STORAGE
+   Blobs stored directly — no base64 overhead, no 5 MB cap.
 ════════════════════════════════════════════════ */
-const STORAGE_KEY = 'memories_collection';
+const DB_NAME    = 'memories_db';
+const DB_VERSION = 1;
+const STORE      = 'memories';
 
-function loadMemories() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch { return []; }
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore(STORE, { keyPath: 'id' });
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror   = e => reject(e.target.error);
+  });
 }
 
-function saveMemories(arr) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-  catch (e) { console.warn('localStorage full:', e); }
+async function loadMemories() {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx  = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror   = () => reject(req.error);
+    });
+  } catch { return []; }
+}
+
+async function addMemoryToDB(memory) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx  = db.transaction(STORE, 'readwrite');
+    const req = tx.objectStore(STORE).add(memory);
+    req.onsuccess = () => resolve();
+    req.onerror   = () => reject(req.error);
+  });
 }
 
 /* ════════════════════════════════════════════════
@@ -427,7 +453,7 @@ const fmtShort = d => d.toLocaleDateString('en-US', { month:'long', day:'numeric
 const fmtFull  = d => d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
 
 /* ════════════════════════════════════════════════
-   SEED DATA (shown on first visit)
+   SEED DATA (shown on first visit — never written to DB)
 ════════════════════════════════════════════════ */
 const SEED = [
   { id:1, name:'Vintage Key',  date:'May 21, 2026', image:'assets/key.png' },
@@ -436,31 +462,42 @@ const SEED = [
   { id:4, name:'Rubber Duck',  date:'May 13, 2026', image:'assets/duck.png' },
 ];
 
-function getMemories() {
-  const stored = loadMemories();
-  return stored.length ? stored : SEED;
-}
-
 /* ════════════════════════════════════════════════
    RENDER GRID
+   Revokes previous grid blob URLs before each render.
 ════════════════════════════════════════════════ */
-function renderGrid() {
-  const memories = getMemories().slice().reverse(); // newest first
-  const grid = document.getElementById('grid');
+let _gridBlobURLs = [];
+
+async function renderGrid() {
+  _gridBlobURLs.forEach(u => URL.revokeObjectURL(u));
+  _gridBlobURLs = [];
+
+  const stored   = await loadMemories();
+  const memories = (stored.length ? stored : SEED).slice().reverse();
 
   document.getElementById('header-date').textContent  = fmtShort(new Date());
   document.getElementById('header-count').textContent =
     `${memories.length} object${memories.length !== 1 ? 's' : ''} collected`;
 
-  grid.innerHTML = memories.map(m => `
-    <div class="card" role="button" tabindex="0" aria-label="${esc(m.name)}" data-id="${m.id}">
-      <div class="card__img-wrap">
-        <img src="${m.image}" alt="${esc(m.name)}" loading="lazy" decoding="async" />
+  const grid = document.getElementById('grid');
+  grid.innerHTML = memories.map(m => {
+    let src;
+    if (m.imageBlob) {
+      src = URL.createObjectURL(m.imageBlob);
+      _gridBlobURLs.push(src);
+    } else {
+      src = m.image; // seed asset path
+    }
+    return `
+      <div class="card" role="button" tabindex="0" aria-label="${esc(m.name)}" data-id="${m.id}">
+        <div class="card__img-wrap">
+          <img src="${src}" alt="${esc(m.name)}" loading="lazy" decoding="async" />
+        </div>
+        <p class="card__name">${esc(m.name)}</p>
+        <p class="card__date">${m.date}</p>
       </div>
-      <p class="card__name">${esc(m.name)}</p>
-      <p class="card__date">${m.date}</p>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function esc(s) {
@@ -480,6 +517,8 @@ function hideOverlay(id) {
 function hideAll() {
   ['camera-overlay','processing-overlay','review-overlay'].forEach(hideOverlay);
   document.getElementById('fab').style.display = 'flex';
+  if (_reviewBlobURL) { URL.revokeObjectURL(_reviewBlobURL); _reviewBlobURL = null; }
+  _pendingBlob = null;
 }
 
 /* ════════════════════════════════════════════════
@@ -530,100 +569,78 @@ function captureFrame() {
 }
 
 /* ════════════════════════════════════════════════
-   STEP 2 — BACKGROUND REMOVAL via remove.bg API
-   DEV_MODE: set true to skip API calls while testing UI
+   STEP 2 — BACKGROUND REMOVAL
+   DEV_SKIP_BG = true  →  skip API, use raw photo
+   DEV_SKIP_BG = false →  calls /api/remove-bg (server proxy)
+   The API key must NEVER be placed in client code.
 ════════════════════════════════════════════════ */
-const DEV_SKIP_BG = true; // ← flip to false when ready to use credits
+const DEV_SKIP_BG = true; // ← set false once /api/remove-bg proxy is deployed
 
 async function removeBackground(jpegDataURL) {
-  // Skip API during UI development
   if (DEV_SKIP_BG) {
     const res = await fetch(jpegDataURL);
     return res.blob();
   }
 
-  // Convert data URL → Blob
   const res  = await fetch(jpegDataURL);
   const blob = await res.blob();
 
-  // Build multipart form for remove.bg
   const form = new FormData();
   form.append('image_file', blob, 'photo.jpg');
   form.append('size', 'auto');
 
-  console.log('[removebg] Sending to API...');
-
-  const response = await fetch('https://api.remove.bg/v1.0/removebg', {
-    method: 'POST',
-    headers: { 'X-Api-Key': 'mkvyD4Lt9VciJAMLPwUip9Ws' },
-    body: form,
-  });
+  const response = await fetch('/api/remove-bg', { method:'POST', body:form });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error(err?.errors?.[0]?.title || `remove.bg ${response.status}`);
+    throw new Error(err?.error || `remove-bg proxy ${response.status}`);
   }
 
-  console.log('[removebg] Done');
-  return response.blob(); // PNG with transparent background
+  return response.blob();
 }
 
 /* ════════════════════════════════════════════════
    STEP 3 — REVIEW
+   _reviewBlobURL is always revoked via hideAll().
 ════════════════════════════════════════════════ */
-let _pendingBlob = null;  // Blob for the bg-removed image
+let _pendingBlob   = null;
+let _reviewBlobURL = null;
 
 function showReview(blob) {
-  // Revoke previous to avoid memory leaks
-  if (_pendingBlob && _pendingBlob !== blob) {
-    if (_pendingBlob instanceof Blob) {
-      const url = document.getElementById('review-img').src;
-      if (url.startsWith('blob:')) URL.revokeObjectURL(url);
-    }
-  }
-  _pendingBlob = blob;
+  if (_reviewBlobURL) { URL.revokeObjectURL(_reviewBlobURL); }
+  _pendingBlob   = blob;
+  _reviewBlobURL = URL.createObjectURL(blob);
 
-  const objectURL = URL.createObjectURL(blob);
-  document.getElementById('review-img').src = objectURL;
-  document.getElementById('name-input').value = '';
+  document.getElementById('review-img').src         = _reviewBlobURL;
+  document.getElementById('name-input').value       = '';
   document.getElementById('name-input').placeholder = 'Name this object…';
 
   hideOverlay('processing-overlay');
   showOverlay('review-overlay');
-
-  // Auto-focus name input after short delay
   setTimeout(() => document.getElementById('name-input').focus(), 300);
 }
 
 /* ════════════════════════════════════════════════
-   STEP 4 — SAVE TO LOCALSTORAGE
+   STEP 4 — SAVE TO INDEXEDDB
 ════════════════════════════════════════════════ */
 async function saveMemory() {
   const name = document.getElementById('name-input').value.trim() || 'My Object';
   const blob = _pendingBlob;
   if (!blob) return;
 
-  // Convert blob → base64 data URL for persistent storage
-  const reader = new FileReader();
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
 
-  reader.onload = () => {
-    const dataURL = reader.result;
-    const memories = loadMemories().length ? loadMemories() : SEED;
-    const newMemory = {
-      id:    Date.now(),
-      name:  name,
-      date:  fmtFull(new Date()),
-      image: dataURL,
-    };
-    memories.push(newMemory);
-    saveMemories(memories);
-
-    _pendingBlob = null;
-
+  try {
+    await addMemoryToDB({ id: Date.now(), name, date: fmtFull(new Date()), imageBlob: blob });
     hideAll();
     renderGrid();
-  };
-  reader.readAsDataURL(blob);
+  } catch (err) {
+    console.error('[save]', err);
+    alert('⚠️ Could not save — storage may be full or unavailable.');
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 /* ════════════════════════════════════════════════
@@ -632,26 +649,19 @@ async function saveMemory() {
 async function onShutterPressed() {
   if (!stream) return;
 
-  // 1. Capture frame from video
   const jpegDataURL = captureFrame();
   stopCamera();
   hideOverlay('camera-overlay');
 
-  // 2. Show processing overlay — set photo as cut-stage preview
   document.getElementById('proc-preview').src = jpegDataURL;
   showOverlay('processing-overlay');
 
   try {
-    // 3. Remove background in browser
     const blob = await removeBackground(jpegDataURL);
-
-    // 4. Show review screen
     showReview(blob);
   } catch (err) {
-    console.error('[mediapipe]', err.message || err);
-    alert(`⚠️ Background removal failed (${err.message || 'unknown error'})\n\nShowing original image. Check console for details.`);
-    // Fallback: convert original JPEG to blob and show
-    const res = await fetch(jpegDataURL);
+    console.error('[bg-removal]', err.message || err);
+    const res          = await fetch(jpegDataURL);
     const fallbackBlob = await res.blob();
     showReview(fallbackBlob);
   }
@@ -665,25 +675,22 @@ document.getElementById('camera-close').addEventListener('click', () => { stopCa
 document.getElementById('shutter-btn').addEventListener('click', onShutterPressed);
 document.getElementById('review-close').addEventListener('click', hideAll);
 
-// Retake: go back to camera
 document.getElementById('retake-btn').addEventListener('click', () => {
+  if (_reviewBlobURL) { URL.revokeObjectURL(_reviewBlobURL); _reviewBlobURL = null; }
+  _pendingBlob = null;
   hideOverlay('review-overlay');
   openCamera();
 });
 
-// Save
 document.getElementById('save-btn').addEventListener('click', saveMemory);
 
-// Enter key in name field saves
 document.getElementById('name-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); saveMemory(); }
 });
 
-// Escape closes everything
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { stopCamera(); hideAll(); }
 });
-
 
 /* ════════════════════════════════════════════════
    INIT
